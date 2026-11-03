@@ -1,0 +1,80 @@
+---
+// Generated blueprint-style artwork for work items that have no cover image.
+// The pattern is derived from the item id, so each card looks different but stable.
+interface Props { id: string; title: string; group: 'research' | 'projects' | 'industry' }
+const { id, title, group } = Astro.props;
+
+// tiny deterministic PRNG from the id
+let seed = 0;
+for (const c of id) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
+const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+const W = 400, H = 250;
+const grid: string[] = [];
+for (let x = 0; x <= W; x += 20) grid.push(`M${x} 0V${H}`);
+for (let y = 0; y <= H; y += 20) grid.push(`M0 ${y}H${W}`);
+
+let motif = '';
+let motif2 = '';
+const pads: { x: number; y: number }[] = [];
+
+if (group === 'research') {
+  // three phase-shifted waves
+  const f = 1.2 + rand() * 1.6, ph = rand() * Math.PI * 2, amp = 34 + rand() * 18;
+  const wave = (k: number) => {
+    let d = '';
+    for (let x = 0; x <= W; x += 4) {
+      const y = H / 2 - amp * Math.sin((x / W) * Math.PI * 2 * f + ph - (k * 2 * Math.PI) / 3);
+      d += `${x === 0 ? 'M' : 'L'}${x} ${y.toFixed(1)}`;
+    }
+    return d;
+  };
+  motif = wave(0);
+  motif2 = wave(1) + wave(2);
+} else if (group === 'projects') {
+  // PCB-like traces with 45° bends and pads
+  for (let t = 0; t < 7; t++) {
+    let x = Math.round((rand() * W) / 20) * 20, y = Math.round((rand() * H) / 20) * 20;
+    let d = `M${x} ${y}`;
+    pads.push({ x, y });
+    let dir = Math.floor(rand() * 4) * 2;
+    for (let s = 0; s < 4; s++) {
+      const len = 40 + Math.floor(rand() * 5) * 20;
+      const dx = [1, 1, 0, -1, -1, -1, 0, 1][dir], dy = [0, 1, 1, 1, 0, -1, -1, -1][dir];
+      x += dx * len; y += dy * len;
+      d += `L${x} ${y}`;
+      dir = (dir + (rand() < 0.5 ? 1 : 7)) % 8;
+    }
+    pads.push({ x, y });
+    (t < 2 ? (motif += d) : (motif2 += d));
+  }
+} else {
+  // concentric hexagon
+  const cx = W * (0.55 + rand() * 0.2), cy = H / 2;
+  for (const r of [44, 78, 112]) {
+    let d = '';
+    for (let k = 0; k <= 6; k++) {
+      const a = (k * Math.PI) / 3 + Math.PI / 6;
+      d += `${k === 0 ? 'M' : 'L'}${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`;
+    }
+    r === 78 ? (motif += d) : (motif2 += d);
+  }
+}
+const initial = title.replace(/[^A-Za-z0-9]/g, '').charAt(0).toUpperCase();
+---
+<svg class="art" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <path d={grid.join('')} class="art-grid" />
+  <path d={motif2} class="art-line2" />
+  <path d={motif} class="art-line" />
+  {pads.map((p) => <circle cx={p.x} cy={p.y} r="4" class="art-pad" />)}
+  <text x="24" y={H - 26} class="art-initial">{initial}</text>
+</svg>
+
+<style>
+  .art { width: 100%; height: 100%; display: block; background: color-mix(in srgb, var(--accent) 6%, var(--bg-elev)); }
+  .art-grid { stroke: var(--ink); stroke-opacity: 0.06; stroke-width: 1; fill: none; }
+  .art-line { stroke: var(--accent); stroke-width: 2; fill: none; stroke-linejoin: round; stroke-linecap: round; opacity: 0.85; }
+  .art-line2 { stroke: var(--ink); stroke-opacity: 0.28; stroke-width: 1.4; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+  .art-pad { fill: var(--bg-elev); stroke: var(--accent); stroke-width: 1.6; }
+  .art-initial { font-family: var(--serif); font-size: 64px; fill: var(--ink); fill-opacity: 0.18; }
+</style>

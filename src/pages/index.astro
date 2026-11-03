@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Phasor from '../components/Phasor.astro';
 import Todo from '../components/Todo.astro';
+import TileArt from '../components/TileArt.astro';
 import profilePhoto from '../assets/profile.jpg';
 import {
   isTodo, profile, intro, about, publications, teaching, coursework, tools, contact,
@@ -11,7 +12,9 @@ import {
 import { getWork, GROUPS, resourceSummary } from '../lib/work';
 
 const work = await getWork();
-const workGroups = GROUPS.map((g) => ({ label: g.label, items: work.filter((w) => w.data.group === g.key) })).filter((g) => g.items.length);
+const workGroups = GROUPS.map((g) => ({ key: g.key, label: g.label, items: work.filter((w) => w.data.group === g.key) })).filter((g) => g.items.length);
+// The first project with a cover image gets a wide, featured card.
+const featuredId = work.find((w) => w.data.group === 'projects' && w.data.cover)?.id;
 
 // Name split into words → letters (for the focus-in animation).
 // Trailing initials ("A B") stay together so they never wrap apart.
@@ -134,7 +137,7 @@ const md = (s: string) =>
       <div class="section-head" data-reveal>
         <span class="eyebrow">Work</span>
         <h2 class="section-title">Research &amp; projects</h2>
-        <p class="section-sub">Each item opens a full page with images, documents and code.</p>
+        <p class="section-sub">Pick any card to open its full page, with images, documents and code.</p>
       </div>
 
       <h3 class="mini-head" data-reveal>Publication</h3>
@@ -149,27 +152,29 @@ const md = (s: string) =>
       {workGroups.map((g) => (
         <>
           <h3 class="mini-head" data-reveal>{g.label}</h3>
-          <div class="rows" data-stagger="60">
+          <div class={`tiles tiles-${g.key}`} data-stagger="80">
             {g.items.map((w) => {
               const d = w.data;
               const meta = [d.role, d.period].filter((m) => m && !isTodo(m)).join(' · ');
               const res = resourceSummary(w);
+              const featured = w.id === featuredId;
+              const thumb = d.cover ?? d.gallery[0]?.src; // fall back to the first gallery image
               return (
-                <a class="row" href={`/work/${w.id}/`} data-reveal>
-                  {d.cover
-                    ? <span class="row-thumb"><Image src={d.cover} alt="" widths={[120, 240]} sizes="96px" /></span>
-                    : <span class="row-thumb row-thumb-empty" aria-hidden="true">{d.title.charAt(0)}</span>}
-                  <span class="row-main">
-                    <span class="row-title" style={`view-transition-name: work-${w.id}`}>{d.title}</span>
-                    <span class="row-one">{d.oneLiner}</span>
-                    {(meta || res.length > 0) && (
-                      <span class="row-meta">
-                        {meta}
-                        {res.length > 0 && <span class="row-res">{res.join(' · ')}</span>}
-                      </span>
-                    )}
+                <a class:list={['tile', { 'tile-featured': featured }]} href={`/work/${w.id}/`} data-reveal>
+                  <span class="tile-media">
+                    {thumb
+                      ? <Image src={thumb} alt="" widths={featured ? [600, 900, 1200] : [400, 640]} sizes={featured ? '(max-width: 900px) 100vw, 640px' : '(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px'} />
+                      : <TileArt id={w.id} title={d.title} group={d.group} />}
                   </span>
-                  <span class="row-arrow" aria-hidden="true"><Icon name="arrow" size={18} /></span>
+                  <span class="tile-body">
+                    {meta && <span class="tile-meta">{meta}</span>}
+                    <span class="tile-title" style={`view-transition-name: work-${w.id}`}>{d.title}</span>
+                    <span class="tile-one">{d.oneLiner}</span>
+                    <span class="tile-foot">
+                      <span class="tile-res">{res.join(' · ')}</span>
+                      <span class="tile-open">Open <Icon name="arrow" size={14} /></span>
+                    </span>
+                  </span>
                 </a>
               );
             })}
@@ -422,46 +427,38 @@ const md = (s: string) =>
   .pub-authors :global(strong) { font-weight: 600; color: var(--ink); }
   .pub-venue { font-style: italic; font-family: var(--serif); font-size: 16.5px; color: var(--muted); margin: 0; }
 
-  .rows { display: flex; flex-direction: column; gap: 10px; }
-  .row {
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr) 24px;
-    align-items: center;
-    gap: 18px;
-    padding: 12px 20px 12px 12px;
+  .tiles { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles-industry { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    overflow: hidden;
     background: var(--bg-elev);
     border: 1px solid var(--line);
-    border-radius: var(--radius);
-    transition: border-color 0.35s, box-shadow 0.5s var(--ease), opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    transition: border-color 0.4s, box-shadow 0.6s var(--ease), translate 0.6s var(--ease), opacity 0.9s var(--ease), transform 0.9s var(--ease);
   }
-  .row:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
-  .row-thumb {
-    width: 76px;
-    height: 60px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--bg);
-    border: 1px solid var(--line);
-  }
-  .row-thumb :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease); }
-  .row:hover .row-thumb :global(img) { transform: scale(1.08); }
-  .row-thumb-empty {
-    display: grid;
-    place-items: center;
-    font-family: var(--serif);
-    font-size: 26px;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border-color: color-mix(in srgb, var(--accent) 22%, transparent);
-  }
-  .row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .row-title { font-weight: 600; font-size: 16.5px; letter-spacing: -0.01em; transition: color 0.3s; width: fit-content; }
-  .row:hover .row-title { color: var(--accent); }
-  .row-one { color: var(--ink-2); font-size: 14.5px; }
-  .row-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-  .row-res { color: var(--accent); }
-  .row-arrow { color: var(--muted); transition: transform 0.5s var(--ease), color 0.3s; }
-  .row:hover .row-arrow { color: var(--accent); transform: translate(3px, -3px); }
+  .tile:hover { border-color: var(--line-strong); box-shadow: var(--shadow-hover); translate: 0 -4px; }
+  .tile-media { display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .tile-media :global(img), .tile-media :global(svg) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+  .tile:hover .tile-media :global(img), .tile:hover .tile-media :global(svg) { transform: scale(1.05); }
+  .tile-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 18px; flex: 1; }
+  .tile-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .tile-title { font-family: var(--serif); font-size: 23px; line-height: 1.15; color: var(--ink); width: fit-content; transition: color 0.3s; }
+  .tile:hover .tile-title { color: var(--accent); }
+  .tile-one { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; flex: 1; }
+  .tile-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .tile-res { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
+  .tile-open { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); transition: color 0.3s, gap 0.4s var(--ease); }
+  .tile:hover .tile-open { color: var(--accent); gap: 8px; }
+
+  /* featured: wide card, image beside text */
+  .tile-featured { grid-column: 1 / -1; flex-direction: row; }
+  .tile-featured .tile-media { flex: 0 0 58%; aspect-ratio: 16 / 9; border-bottom: 0; border-right: 1px solid var(--line); }
+  .tile-featured .tile-body { padding: clamp(22px, 3vw, 36px); justify-content: center; }
+  .tile-featured .tile-title { font-size: clamp(28px, 3vw, 38px); }
+  .tile-featured .tile-one { flex: 0; font-size: 16px; margin-bottom: 8px; }
+  .tile-featured .tile-foot { margin-top: 16px; }
 
   /* ── Academics ── */
   .kit { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 48px; }
@@ -536,12 +533,18 @@ const md = (s: string) =>
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
   }
+  @media (max-width: 900px) {
+    .tiles, .tiles-industry { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tile-featured { flex-direction: column; }
+    .tile-featured .tile-media { flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  }
   @media (max-width: 700px) {
     .intro-top { padding-bottom: 240px; }
   }
+  @media (max-width: 600px) {
+    .tiles, .tiles-industry { grid-template-columns: minmax(0, 1fr); }
+  }
   @media (max-width: 560px) {
-    .row { grid-template-columns: 56px minmax(0, 1fr) 18px; gap: 14px; padding: 10px 14px 10px 10px; }
-    .row-thumb { width: 56px; height: 48px; }
     .edu li { flex-direction: column; gap: 6px; }
     .edu-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: 12px; }
     .kit-list div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
