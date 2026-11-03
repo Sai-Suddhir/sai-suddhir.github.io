@@ -1,0 +1,27 @@
+---
+// Shows a visible placeholder badge on the local preview only.
+// On the built/published site this renders nothing.
+interface Props { text?: string }
+const { text = 'TODO' } = Astro.props;
+const show = import.meta.env.DEV;
+---
+{show && <span class="todo" title="Placeholder: only visible on the local preview">{text.replace(/^TODO:?\s*/, 'TODO: ')}</span>}
+
+<style>
+  .todo {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.4;
+    padding: 2px 8px;
+    border: 1px dashed #c99a00;
+    background: rgba(255, 200, 0, 0.12);
+    color: #8a6a00;
+    border-radius: 6px;
+    white-space: normal;
+    vertical-align: middle;
+  }
+  @media (prefers-color-scheme: dark) {
+    .todo { color: #f0c94a; }
+  }
+</style>

@@ -6,7 +6,7 @@ import { profile } from '../data/content';
 interface Props { title?: string; description?: string }
 const {
   title = `${profile.name}: Power Electronics & Control`,
-  description = `${profile.name}, dual-degree student at ${profile.institution}. ${profile.tagline}`,
+  description = `${profile.name}, ${profile.institution}: ${profile.focus}. ${profile.tagline}`,
 } = Astro.props;
 
 const nav = [
