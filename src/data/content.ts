@@ -25,13 +25,19 @@ export const profile = {
 
 /* ── About ───────────────────────────────────────────────── */
 // **double asterisks** make text bold.
-export const about = {
-  // 1) you as a person  2) how you got into engineering
-  bio: [
-    "Outside of engineering, I'm a trained **Carnatic vocalist and keyboardist** (with a keyboard certification from Trinity College London), and jamming with friends is one of my favourite ways to unwind. I captained my school **cricket** team for two years, try to keep fitness part of every day, and I'm usually the first one excited about a late-night outing, a trip or an adventure.",
-    'I also like to **write**. On my old blog I wrote short essays on leadership, solitude and staying calm amidst the storm.',
-    "I'm now a dual-degree student at IIT Madras. I chose aerospace because of **Dr. A.P.J. Abdul Kalam**, and along the way I got pulled toward electrical engineering and taught myself much of it, from designing boards to the control theory behind them.",
+/* ── Home: name → quote → photo + who I am ───────────────── */
+// **double asterisks** make text bold.
+export const intro = {
+  // The quote under your name (the one from your old blog). Leave `by` empty for no attribution.
+  quote: { text: 'The magic you are looking for is in the work you are avoiding.', by: '' },
+  paragraphs: [
+    "I'm Sai, a dual-degree student at **IIT Madras**. I picked aerospace because of **Dr. A.P.J. Abdul Kalam**, then found myself pulled toward electrical engineering, and taught myself most of it one board at a time. These days I spend my time on power converters and the control behind them.",
+    "Away from the lab, I'm a trained **Carnatic vocalist and keyboardist**, and jamming with friends is my favourite way to unwind. I captained my school cricket team, try to keep fitness part of every day, write the occasional essay, and I'm usually the first one excited about a late-night outing or a trip somewhere new.",
   ],
+};
+
+/* ── Background: education, interests, honors ──────────── */
+export const about = {
   interests: {
     engineering: [
       'Power electronics',

@@ -2,19 +2,24 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import CircuitBoard from '../components/CircuitBoard.astro';
+import Strings from '../components/Strings.astro';
 import Todo from '../components/Todo.astro';
 import profilePhoto from '../assets/profile.jpg';
 import {
-  isTodo, profile, about, publications, teaching, coursework, tools, contact,
+  isTodo, profile, intro, about, publications, teaching, coursework, tools, contact,
 } from '../data/content';
 import { getWork, GROUPS, resourceSummary } from '../lib/work';
 
 const work = await getWork();
 const workGroups = GROUPS.map((g) => ({ label: g.label, items: work.filter((w) => w.data.group === g.key) })).filter((g) => g.items.length);
 
-// keep trailing initials together (e.g. 'A B') so they never wrap apart
-const nameWords = profile.name.replace(/((?:\s[A-Z]\.?)+)$/, (m) => ' ' + m.trim().replace(/\s/g, ' ')).split(' ');
+// Name split into words → letters (for the focus-in animation).
+// Trailing initials ("A B") stay together so they never wrap apart.
+const nameWords = profile.name
+  .replace(/((?:\s[A-Z]\.?)+)$/, (m) => ' ' + m.trim().replace(/\s/g, '\u00a0'))
+  .split(' ');
+let letterIndex = 0;
+const nameLetters = nameWords.map((w) => Array.from(w).map((ch) => ({ ch, i: letterIndex++ })));
 
 // **bold** → <strong>
 const md = (s: string) =>
@@ -22,53 +27,59 @@ const md = (s: string) =>
 
 ---
 <Base>
-  <!-- ───────── Home ───────── -->
-  <section class="hero" id="top">
-    <CircuitBoard />
-    <div class="container hero-inner">
-      <div class="hero-copy">
-        <h1 class="hero-title">
-          {nameWords.map((w, i) => (
-            <span class="word"><span style={`--h:${i + 1}`}>{w}</span></span>
+  <!-- ───────── Home: name, quote, photo, who I am ───────── -->
+  <section class="intro" id="top">
+    <div class="intro-top">
+      <Strings />
+      <div class="container intro-head">
+        <h1 class="name" aria-label={profile.name}>
+          {nameLetters.map((word) => (
+            <span class="name-word" aria-hidden="true">
+              {word.map(({ ch, i }) => <span class="ch" style={`--i:${i}`}>{ch}</span>)}
+            </span>
           ))}
         </h1>
-        <p class="hero-lead hero-fade" style="--h:4">{profile.tagline}</p>
-        <div class="hero-actions hero-fade" style="--h:5">
+        <figure class="quote fade" style="--h:0">
+          <blockquote>{intro.quote.text}</blockquote>
+          {intro.quote.by && <figcaption>{intro.quote.by}</figcaption>}
+        </figure>
+      </div>
+    </div>
+
+    <div class="container intro-body" id="about">
+      <figure class="me fade" style="--h:1">
+        <span class="me-frame">
+          <Image src={profilePhoto} alt={`Photo of ${profile.name}`} widths={[360, 560, 760]} sizes="(max-width: 760px) 80vw, 340px" loading="eager" />
+        </span>
+      </figure>
+      <div class="intro-text">
+        {intro.paragraphs.map((p, i) => <p class="fade" style={`--h:${2 + i}`} set:html={md(p)} />)}
+        <div class="intro-actions fade" style="--h:4">
           <a class="btn btn-primary" href={profile.links.cv} target="_blank" rel="noopener">
             <Icon name="download" size={16} /> Download CV
           </a>
           <a class="btn" href="#contact">
             <Icon name="mail" size={16} /> Get in touch
           </a>
-          <span class="hero-social">
+          <span class="intro-social">
             <a href={profile.links.github} target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={19} /></a>
             <a href={profile.links.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={19} /></a>
             {!isTodo(profile.links.scholar) && <a href={profile.links.scholar} target="_blank" rel="noopener" aria-label="Google Scholar"><Icon name="scholar" size={19} /></a>}
           </span>
         </div>
       </div>
-
     </div>
-    <a href="#about" class="scroll-cue hero-fade" style="--h:7" aria-label="Scroll to About">
-      <span>Scroll</span><i></i>
-    </a>
   </section>
 
-  <!-- ───────── About ───────── -->
-  <section class="section" id="about">
+  <!-- ───────── Background: education, interests, honors ───────── -->
+  <section class="section" id="background">
     <div class="container">
       <div class="section-head" data-reveal>
-        <span class="eyebrow">About</span>
-        <h2 class="section-title">Hello, I'm Sai.</h2>
+        <span class="eyebrow">Background</span>
+        <h2 class="section-title">A little more about me</h2>
       </div>
-      <div class="about-grid">
-        <figure class="portrait" data-reveal>
-          <Image src={profilePhoto} alt={`Portrait of ${profile.name}`} widths={[360, 560, 720]} sizes="(max-width: 760px) 100vw, 300px" />
-          {isTodo(profile.photoNote) && <figcaption><Todo text={profile.photoNote} /></figcaption>}
-        </figure>
-        <div class="about-body">
-          {about.bio.map((p, i) => <p class="about-p" data-reveal style={`--d:${i * 90}ms`} set:html={md(p)} />)}
-
+      <div class="bg-grid">
+        <div>
           <h3 class="mini-head" data-reveal>Education</h3>
           <ul class="edu" data-stagger="90">
             {about.education.map((e) => (
@@ -85,6 +96,18 @@ const md = (s: string) =>
             ))}
           </ul>
 
+          <h3 class="mini-head" data-reveal>Honors &amp; leadership</h3>
+          <ul class="bullets honors" data-stagger="60">
+            {about.honors.map((h) => <li data-reveal>{h}</li>)}
+            {about.leadership.map((l) => (
+              <li data-reveal>
+                <strong>{l.role}</strong>: {l.text} {isTodo(l.period) ? <Todo text={l.period} /> : <span class="period">({l.period})</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
           <h3 class="mini-head" data-reveal>Interests</h3>
           <div class="interests">
             <div data-reveal>
@@ -100,16 +123,6 @@ const md = (s: string) =>
               </ul>
             </div>
           </div>
-
-          <h3 class="mini-head" data-reveal>Honors &amp; leadership</h3>
-          <ul class="bullets honors" data-stagger="60">
-            {about.honors.map((h) => <li data-reveal>{h}</li>)}
-            {about.leadership.map((l) => (
-              <li data-reveal>
-                <strong>{l.role}</strong>: {l.text} {isTodo(l.period) ? <Todo text={l.period} /> : <span class="period">({l.period})</span>}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </div>
@@ -253,86 +266,128 @@ const md = (s: string) =>
 </Base>
 
 <style>
-  /* ── Hero ── */
-  .hero {
+  /* ── Intro ── */
+  .intro { position: relative; padding-bottom: clamp(24px, 4vw, 48px); }
+  .intro-top {
     position: relative;
-    min-height: 100svh;
-    display: flex;
-    align-items: center;
-    padding: 112px 0 120px;
+    padding: clamp(120px, 17vh, 170px) 0 clamp(56px, 8vh, 88px);
     overflow: hidden;
   }
-  .hero::before {
+  .intro-top::before {
     content: '';
     position: absolute;
-    inset: -20% -10% auto auto;
-    width: 60vw;
-    height: 60vw;
-    max-width: 760px;
-    max-height: 760px;
-    background: radial-gradient(closest-side, var(--accent-soft), transparent 70%);
-    filter: blur(10px);
-    animation: drift 18s ease-in-out infinite alternate;
+    left: 50%;
+    top: 40%;
+    width: min(900px, 120vw);
+    height: 420px;
+    translate: -50% -50%;
+    background: radial-gradient(closest-side, var(--accent-soft), transparent 75%);
+    filter: blur(20px);
     pointer-events: none;
+    animation: breathe 9s ease-in-out infinite alternate;
   }
-  @keyframes drift { to { transform: translate(-8%, 10%) scale(1.08); } }
-  .hero-inner { position: relative; z-index: 1; }
+  @keyframes breathe { to { opacity: 0.55; transform: scale(1.06); } }
+  .intro-head { position: relative; z-index: 1; text-align: center; }
 
-  .hero-title {
+  .name {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(48px, 9vw, 116px);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
-    margin: 0 0 26px;
+    font-size: clamp(58px, 11.5vw, 156px);
+    line-height: 0.95;
+    letter-spacing: -0.012em;
+    margin: 0;
     display: flex;
     flex-wrap: wrap;
-    column-gap: 0.24em;
+    justify-content: center;
+    column-gap: 0.22em;
   }
-  .word { display: inline-block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
-  .word > span {
+  .name-word { display: inline-flex; white-space: nowrap; }
+  .ch {
     display: inline-block;
-    transform: translateY(105%);
-    animation: rise 1.1s var(--ease) forwards;
-    animation-delay: calc(0.15s + var(--h) * 0.09s);
-  }
-  .hero-fade {
     opacity: 0;
-    transform: translateY(12px);
-    animation: fade-up 1s var(--ease) forwards;
-    animation-delay: calc(0.15s + var(--h) * 0.1s);
+    filter: blur(12px);
+    transform: translateY(0.06em) scale(1.04);
+    animation: focus-in 1.4s var(--ease) forwards;
+    animation-delay: calc(0.25s + var(--i) * 55ms);
   }
-  @keyframes rise { to { transform: none; } }
+  @keyframes focus-in { to { opacity: 1; filter: blur(0); transform: none; } }
+
+  .quote { margin: clamp(22px, 3.4vw, 36px) auto 0; max-width: 760px; text-wrap: balance; }
+  .quote blockquote {
+    margin: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(21px, 2.7vw, 30px);
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .quote blockquote::before, .quote blockquote::after { color: var(--accent); }
+  .quote blockquote::before { content: '“'; }
+  .quote blockquote::after { content: '”'; }
+  .quote figcaption { margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .quote figcaption::before { content: '— '; }
+
+  .fade {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fade-up 1.1s var(--ease) forwards;
+    animation-delay: calc(1.15s + var(--h) * 0.14s);
+  }
   @keyframes fade-up { to { opacity: 1; transform: none; } }
 
-  .hero-lead {
-    max-width: 620px;
-    font-size: clamp(17px, 1.9vw, 20px);
-    line-height: 1.6;
-    color: var(--ink-2);
-    margin-bottom: 34px;
+  .intro-body {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: clamp(36px, 6vw, 80px);
+    align-items: center;
+    max-width: 1000px;
   }
-  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .hero-social { display: inline-flex; gap: 4px; margin-left: 6px; }
-  .hero-social a {
+  .me { margin: 0; position: relative; }
+  .me::before {
+    content: '';
+    position: absolute;
+    inset: 14px -14px -14px 14px;
+    border: 1px solid color-mix(in srgb, var(--accent) 75%, transparent);
+    border-radius: 999px 999px 26px 26px;
+    transition: transform 0.9s var(--ease);
+    pointer-events: none;
+  }
+  .me:hover::before { transform: translate(-6px, -6px); }
+  .me-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    border-radius: 999px 999px 26px 26px;
+    overflow: hidden;
+    background: var(--line);
+    box-shadow: var(--shadow-hover);
+  }
+  .me-frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 1.4s var(--ease); }
+  .me:hover .me-frame :global(img) { transform: scale(1.035); }
+
+  .intro-text p { font-size: clamp(17px, 1.6vw, 19px); line-height: 1.8; color: var(--ink-2); margin: 0 0 1.1em; }
+  .intro-text p :global(strong) { color: var(--ink); font-weight: 600; }
+  .intro-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; }
+  .intro-social { display: inline-flex; gap: 4px; margin-left: 4px; }
+  .intro-social a {
     width: 42px;
     height: 42px;
     display: grid;
     place-items: center;
-    border-radius: 12px;
+    border-radius: 50%;
     color: var(--ink-2);
     transition: color 0.3s, background-color 0.3s, transform 0.4s var(--ease);
   }
-  .hero-social a:hover { color: var(--accent); background: var(--accent-soft); transform: translateY(-2px); }
+  .intro-social a:hover { color: var(--accent); background: var(--accent-soft); transform: translateY(-2px); }
 
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 14.5px;
-    font-weight: 500;
-    padding: 11px 18px;
-    border-radius: 12px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 999px;
     border: 1px solid var(--line-strong);
     background: var(--bg-elev);
     color: var(--ink);
@@ -341,35 +396,6 @@ const md = (s: string) =>
   .btn:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); box-shadow: var(--shadow); }
   .btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
   .btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  .scroll-cue {
-    position: absolute;
-    left: 50%;
-    bottom: 22px;
-    translate: -50% 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    z-index: 1;
-  }
-  .scroll-cue i { width: 1px; height: 34px; background: var(--line-strong); position: relative; overflow: hidden; }
-  .scroll-cue i::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: -40%;
-    width: 1px;
-    height: 40%;
-    background: var(--accent);
-    animation: cue 2.2s var(--ease) infinite;
-  }
-  @keyframes cue { to { top: 100%; } }
 
   /* ── Section bits ── */
   .section-sub { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
@@ -384,23 +410,9 @@ const md = (s: string) =>
   }
   .period { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 
-  /* ── About ── */
-  .about-grid { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: clamp(32px, 6vw, 72px); align-items: start; }
-  .portrait {
-    margin: 0;
-    border-radius: 18px;
-    overflow: hidden;
-    aspect-ratio: 4 / 5;
-    background: var(--line);
-    position: sticky;
-    top: 96px;
-  }
-  .portrait :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 1.2s var(--ease); }
-  .portrait:hover :global(img) { transform: scale(1.03); }
-  .portrait figcaption { position: absolute; left: 10px; right: 10px; bottom: 10px; }
-  .about-p { font-size: 18px; line-height: 1.75; color: var(--ink-2); max-width: 640px; }
-  .about-p :global(strong) { color: var(--ink); font-weight: 600; }
-  .about-body > .about-p:first-child { margin-top: 0; }
+  /* ── Background ── */
+  .bg-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 72px); align-items: start; }
+  .bg-grid > div > .mini-head:first-child { margin-top: 0; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chips li {
@@ -419,7 +431,7 @@ const md = (s: string) =>
   .edu li { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--line); }
   .edu li:last-child { border-bottom: 1px solid var(--line); }
   .edu p { margin: 0; }
-  .edu-school { font-weight: 500; }
+  .edu-school { font-weight: 600; }
   .edu-degree { color: var(--muted); font-size: 14.5px; }
   .edu-meta { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-size: 13px; color: var(--muted); white-space: nowrap; font-family: var(--mono); }
   .edu-detail { color: var(--accent); }
@@ -542,8 +554,9 @@ const md = (s: string) =>
 
   /* ── Responsive ── */
   @media (max-width: 860px) {
-    .about-grid { grid-template-columns: minmax(0, 1fr); }
-    .portrait { position: relative; top: 0; max-width: 260px; }
+    .intro-body { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: left; }
+    .me { width: min(300px, 72vw); }
+    .bg-grid { grid-template-columns: minmax(0, 1fr); }
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
   }
@@ -553,10 +566,10 @@ const md = (s: string) =>
     .edu li { flex-direction: column; gap: 6px; }
     .edu-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: 12px; }
     .kit-list div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-    .hero-social { margin-left: 0; }
+    .intro-social { margin-left: 0; }
     .pub { padding: 20px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .word > span, .hero-fade { transform: none; opacity: 1; }
+    .ch, .fade { transform: none; opacity: 1; filter: none; animation: none; }
   }
 </style>

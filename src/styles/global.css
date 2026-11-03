@@ -12,9 +12,9 @@
   --shadow: 0 1px 2px rgba(20, 20, 20, 0.04), 0 8px 28px rgba(20, 20, 20, 0.06);
   --shadow-hover: 0 2px 4px rgba(20, 20, 20, 0.05), 0 18px 48px rgba(20, 20, 20, 0.10);
 
-  --serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'DM Mono', ui-monospace, 'SF Mono', Consolas, monospace;
 
   --max: 1080px;
   --gutter: clamp(16px, 4vw, 32px);
@@ -69,6 +69,7 @@ body {
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  font-synthesis-weight: none; /* Instrument Serif has one weight: never fake bold */
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
@@ -78,6 +79,7 @@ a { color: inherit; text-decoration: none; }
 p { margin: 0 0 1em; }
 ul { margin: 0; padding: 0; list-style: none; }
 h1, h2, h3 { margin: 0; font-weight: 500; }
+.section-title, .prose h2 { font-weight: 400; }
 ::selection { background: var(--accent); color: #fff; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
@@ -120,9 +122,9 @@ h1, h2, h3 { margin: 0; font-weight: 500; }
 }
 .section-title {
   font-family: var(--serif);
-  font-size: clamp(30px, 4.4vw, 44px);
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
 }
 
 .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
