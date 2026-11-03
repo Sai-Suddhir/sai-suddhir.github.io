@@ -25,15 +25,13 @@ const md = (s: string) =>
   <!-- ───────── Home ───────── -->
   <section class="hero" id="top">
     <CircuitBoard />
-    <div class="container hero-grid">
+    <div class="container hero-inner">
       <div class="hero-copy">
-        <p class="status hero-fade" style="--h:0"><span class="status-dot" aria-hidden="true"></span>{profile.status}</p>
         <h1 class="hero-title">
           {nameWords.map((w, i) => (
             <span class="word"><span style={`--h:${i + 1}`}>{w}</span></span>
           ))}
         </h1>
-        <p class="hero-focus hero-fade" style="--h:3">{profile.focus}</p>
         <p class="hero-lead hero-fade" style="--h:4">{profile.tagline}</p>
         <div class="hero-actions hero-fade" style="--h:5">
           <a class="btn btn-primary" href={profile.links.cv} target="_blank" rel="noopener">
@@ -50,23 +48,6 @@ const md = (s: string) =>
         </div>
       </div>
 
-      <aside class="now-wrap hero-fade" style="--h:6" aria-label="Currently">
-        <div class="now-card">
-          <div class="now-head">
-            <Image class="now-avatar" src={profilePhoto} alt="" widths={[96, 192]} sizes="64px" loading="eager" />
-            <div>
-              <p class="now-name">{profile.name}</p>
-              <p class="now-sub">{profile.institution} · {profile.location}</p>
-            </div>
-          </div>
-          <p class="now-label">Now</p>
-          <ul class="now-list">
-            {profile.now.map((n) => (
-              <li><a href={n.href}><span class="now-key">{n.label}</span><span>{n.text}</span></a></li>
-            ))}
-          </ul>
-        </div>
-      </aside>
     </div>
     <a href="#about" class="scroll-cue hero-fade" style="--h:7" aria-label="Scroll to About">
       <span>Scroll</span><i></i>
@@ -88,11 +69,6 @@ const md = (s: string) =>
         <div class="about-body">
           {about.bio.map((p, i) => <p class="about-p" data-reveal style={`--d:${i * 90}ms`} set:html={md(p)} />)}
 
-          <h3 class="mini-head" data-reveal>Interests</h3>
-          <ul class="chips" data-stagger="50">
-            {about.interests.map((x) => <li data-reveal>{x}</li>)}
-          </ul>
-
           <h3 class="mini-head" data-reveal>Education</h3>
           <ul class="edu" data-stagger="90">
             {about.education.map((e) => (
@@ -108,6 +84,22 @@ const md = (s: string) =>
               </li>
             ))}
           </ul>
+
+          <h3 class="mini-head" data-reveal>Interests</h3>
+          <div class="interests">
+            <div data-reveal>
+              <p class="int-label">In engineering</p>
+              <ul class="chips" data-stagger="50">
+                {about.interests.engineering.map((x) => <li data-reveal>{x}</li>)}
+              </ul>
+            </div>
+            <div data-reveal>
+              <p class="int-label">Outside it</p>
+              <ul class="chips chips-soft" data-stagger="50">
+                {about.interests.life.map((x) => <li data-reveal>{x}</li>)}
+              </ul>
+            </div>
+          </div>
 
           <h3 class="mini-head" data-reveal>Honors &amp; leadership</h3>
           <ul class="bullets honors" data-stagger="60">
@@ -284,46 +276,15 @@ const md = (s: string) =>
     pointer-events: none;
   }
   @keyframes drift { to { transform: translate(-8%, 10%) scale(1.08); } }
-  .hero-grid {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 330px;
-    gap: clamp(32px, 5vw, 72px);
-    align-items: center;
-  }
-  .status {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-    padding: 6px 14px 6px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg-elev) 75%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    font-size: 13px;
-    color: var(--ink-2);
-  }
-  .status-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #2fa66a; flex: none; }
-  .status-dot::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: #2fa66a;
-    animation: ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-  @keyframes ping { 75%, 100% { transform: scale(2.6); opacity: 0; } }
+  .hero-inner { position: relative; z-index: 1; }
 
   .hero-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: clamp(44px, 6vw, 88px);
+    font-size: clamp(48px, 9vw, 116px);
     line-height: 0.98;
     letter-spacing: -0.035em;
-    margin: 22px 0 14px;
+    margin: 0 0 26px;
     display: flex;
     flex-wrap: wrap;
     column-gap: 0.24em;
@@ -344,16 +305,8 @@ const md = (s: string) =>
   @keyframes rise { to { transform: none; } }
   @keyframes fade-up { to { opacity: 1; transform: none; } }
 
-  .hero-focus {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 22px;
-  }
   .hero-lead {
-    max-width: 600px;
+    max-width: 620px;
     font-size: clamp(17px, 1.9vw, 20px);
     line-height: 1.6;
     color: var(--ink-2);
@@ -371,62 +324,6 @@ const md = (s: string) =>
     transition: color 0.3s, background-color 0.3s, transform 0.4s var(--ease);
   }
   .hero-social a:hover { color: var(--accent); background: var(--accent-soft); transform: translateY(-2px); }
-
-  /* profile card */
-  .now-wrap.hero-fade {
-    animation-name: fade-up, float;
-    animation-duration: 1s, 7s;
-    animation-timing-function: var(--ease), ease-in-out;
-    animation-delay: calc(0.15s + var(--h) * 0.1s), 1.4s;
-    animation-iteration-count: 1, infinite;
-    animation-direction: normal, alternate;
-    animation-fill-mode: forwards, none;
-  }
-  @keyframes float { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-  .now-card {
-    padding: 22px 22px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg-elev) 82%, transparent);
-    backdrop-filter: blur(14px) saturate(1.3);
-    -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    box-shadow: var(--shadow-hover);
-    transition: transform 0.6s var(--ease), border-color 0.4s;
-  }
-  .now-card:hover { transform: translateY(-4px); border-color: var(--line-strong); }
-  .now-head { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-  .now-head :global(.now-avatar) {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: 50% 62%;
-    box-shadow: 0 0 0 3px var(--bg-elev), 0 0 0 4px var(--accent);
-  }
-  .now-name { margin: 0; font-weight: 600; font-size: 15.5px; letter-spacing: -0.01em; }
-  .now-sub { margin: 0; color: var(--muted); font-size: 13px; }
-  .now-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 16px 0 6px;
-  }
-  .now-list a {
-    display: grid;
-    grid-template-columns: 58px 1fr;
-    gap: 10px;
-    font-size: 14px;
-    line-height: 1.45;
-    padding: 8px 8px;
-    margin: 0 -8px;
-    border-radius: 10px;
-    color: var(--ink-2);
-    transition: background-color 0.3s, color 0.3s;
-  }
-  .now-list a:hover { background: var(--accent-soft); color: var(--ink); }
-  .now-key { font-family: var(--mono); font-size: 11.5px; color: var(--accent); padding-top: 2px; }
 
   .btn {
     display: inline-flex;
@@ -515,6 +412,9 @@ const md = (s: string) =>
     transition: border-color 0.3s, color 0.3s, transform 0.9s var(--ease), opacity 0.9s var(--ease);
   }
   .chips li:hover { border-color: var(--accent); color: var(--accent); }
+  .interests { display: flex; flex-direction: column; gap: 18px; }
+  .int-label { margin: 0 0 8px; font-size: 13.5px; color: var(--muted); }
+  .chips-soft li { background: transparent; border-style: dashed; }
 
   .edu li { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--line); }
   .edu li:last-child { border-bottom: 1px solid var(--line); }
@@ -642,8 +542,6 @@ const md = (s: string) =>
 
   /* ── Responsive ── */
   @media (max-width: 860px) {
-    .hero-grid { grid-template-columns: minmax(0, 1fr); }
-    .now-wrap { max-width: 420px; }
     .about-grid { grid-template-columns: minmax(0, 1fr); }
     .portrait { position: relative; top: 0; max-width: 260px; }
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
@@ -659,6 +557,6 @@ const md = (s: string) =>
     .pub { padding: 20px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .word > span, .hero-fade, .now-wrap { transform: none; opacity: 1; }
+    .word > span, .hero-fade { transform: none; opacity: 1; }
   }
 </style>

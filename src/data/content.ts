@@ -10,7 +10,6 @@ export const isTodo = (v?: string) => !v || v.startsWith('TODO');
 
 export const profile = {
   name: 'Sai Suddhir A B',
-  focus: 'Power Electronics · Control · Embedded & FPGA Hardware',
   institution: 'IIT Madras',
   email: 'ae22b013@smail.iitm.ac.in',
   links: {
@@ -22,30 +21,27 @@ export const profile = {
   photoNote: 'TODO: replace src/assets/profile.jpg with a professional head-and-shoulders photo',
   tagline:
     'I work on power converter control: geometric boundary control laws, and the embedded and FPGA hardware that runs and tests them in real time.',
-  status: 'Applying for MS programs in Electrical Engineering',
-  location: 'Chennai, India',
-  // Short "what I'm doing now" list in the hero card. `href` opens a project page.
-  now: [
-    { label: 'Thesis', text: 'Boundary control & sensor reduction for inverters', href: '/work/ddp/' },
-    { label: 'Paper', text: 'Under review at ICPE 2027', href: '/work/ddp/' },
-    { label: 'Lab', text: 'My HIL platform now trains juniors in the power lab', href: '/work/hil/' },
-  ],
 };
 
 /* ── About ───────────────────────────────────────────────── */
 // **double asterisks** make text bold.
 export const about = {
+  // 1) you as a person  2) how you got into engineering
   bio: [
-    "I'm a **dual-degree student at IIT Madras** (B.Tech Aerospace + M.Tech Electric Vehicles). My undergrad is in aerospace, which I chose because of Dr. A.P.J. Abdul Kalam. Along the way I got pulled toward **electrical engineering** and built those skills on my own.",
-    'Today I work on **power converter control**, **real-time hardware simulation**, and **battery systems for EVs**. Outside the lab, I am a trained Carnatic vocalist and keyboardist.',
+    "Outside of engineering, I'm a trained **Carnatic vocalist and keyboardist** (with a keyboard certification from Trinity College London), and jamming with friends is one of my favourite ways to unwind. I captained my school **cricket** team for two years, try to keep fitness part of every day, and I'm usually the first one excited about a late-night outing, a trip or an adventure.",
+    'I also like to **write**. On my old blog I wrote short essays on leadership, solitude and staying calm amidst the storm.',
+    "I'm now a dual-degree student at IIT Madras. I chose aerospace because of **Dr. A.P.J. Abdul Kalam**, and along the way I got pulled toward electrical engineering and taught myself much of it, from designing boards to the control theory behind them.",
   ],
-  interests: [
-    'Power electronics',
-    'Nonlinear & geometric control',
-    'Embedded & FPGA hardware',
-    'Real-time simulation & HIL',
-    'Battery systems for EVs',
-  ],
+  interests: {
+    engineering: [
+      'Power electronics',
+      'Nonlinear & geometric control',
+      'Embedded & FPGA hardware',
+      'Real-time simulation',
+      'Battery systems for EVs',
+    ],
+    life: ['Carnatic music', 'Keyboard', 'Cricket', 'Fitness', 'Writing', 'Travel & adventure', 'Movies'],
+  },
   education: [
     {
       school: 'Indian Institute of Technology Madras',

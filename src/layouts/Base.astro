@@ -4,10 +4,7 @@ import Icon from '../components/Icon.astro';
 import { profile } from '../data/content';
 
 interface Props { title?: string; description?: string }
-const {
-  title = `${profile.name}: Power Electronics & Control`,
-  description = `${profile.name}, ${profile.institution}: ${profile.focus}. ${profile.tagline}`,
-} = Astro.props;
+const { title = profile.name, description = `${profile.name}. ${profile.tagline}` } = Astro.props;
 
 const nav = [
   { href: '#about', label: 'About' },
@@ -55,21 +52,18 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
     <div class="progress" aria-hidden="true"></div>
 
     <header class="site-header">
-      <div class="container bar">
-        <a href={isHome ? '#top' : '/'} class="brand" aria-label={isHome ? 'Back to top' : 'Home'}>
-          <span class="brand-mark">S</span>
-          <span class="brand-name">{profile.name}</span>
-        </a>
+      <div class="pill">
+        <a href={isHome ? '#top' : '/'} class="brand" aria-label={isHome ? 'Back to top' : 'Home'}>S</a>
+        <span class="sep" aria-hidden="true"></span>
         <nav class="nav-links" aria-label="Sections">
-          {nav.map((n) => <a href={here(n.href)}>{n.label}</a>)}
+          <span class="glide" aria-hidden="true"></span>
+          {nav.map((n) => <a href={here(n.href)} class:list={[{ 'nav-cv': n.href === '#cv' }]}>{n.label}</a>)}
         </nav>
-        <div class="bar-actions">
-          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
-            <span class="i-sun"><Icon name="sun" size={17} /></span>
-            <span class="i-moon"><Icon name="moon" size={17} /></span>
-          </button>
-          <a class="cv-btn" href={profile.links.cv} target="_blank" rel="noopener">CV</a>
-        </div>
+        <span class="sep" aria-hidden="true"></span>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+          <span class="i-sun"><Icon name="sun" size={16} /></span>
+          <span class="i-moon"><Icon name="moon" size={16} /></span>
+        </button>
       </div>
     </header>
 
@@ -91,6 +85,7 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
     <script>
       import '../scripts/motion';
 
+      /* theme toggle */
       const btn = document.querySelector<HTMLButtonElement>('.theme-toggle');
       btn?.addEventListener('click', () => {
         const root = document.documentElement;
@@ -101,6 +96,26 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
         root.dataset.theme = next;
         try { localStorage.setItem('theme', next); } catch (e) {}
       });
+
+      /* gliding highlight behind the nav links */
+      const navEl = document.querySelector<HTMLElement>('.nav-links');
+      const glide = document.querySelector<HTMLElement>('.glide');
+      if (navEl && glide) {
+        const links = Array.from(navEl.querySelectorAll<HTMLAnchorElement>('a'));
+        const moveTo = (a: HTMLElement | null | undefined) => {
+          if (!a) { glide.style.opacity = '0'; return; }
+          glide.style.opacity = '1';
+          glide.style.width = `${a.offsetWidth}px`;
+          glide.style.transform = `translateX(${a.offsetLeft}px)`;
+        };
+        const active = () => links.find((l) => l.classList.contains('is-active'));
+        links.forEach((l) => l.addEventListener('mouseenter', () => moveTo(l)));
+        navEl.addEventListener('mouseleave', () => moveTo(active()));
+        new MutationObserver(() => { if (!navEl.matches(':hover')) moveTo(active()); })
+          .observe(navEl, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('resize', () => moveTo(active()));
+        document.fonts?.ready.then(() => moveTo(active()));
+      }
     </script>
   </body>
 </html>
@@ -128,76 +143,101 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
     z-index: 60;
   }
 
+  /* ── Floating capsule nav ── */
   .site-header {
     position: fixed;
-    inset: 0 0 auto 0;
+    top: 16px;
+    left: 0;
+    right: 0;
     z-index: 50;
-    transition: transform 0.6s var(--ease), background-color 0.4s, border-color 0.4s, backdrop-filter 0.4s;
-    border-bottom: 1px solid transparent;
+    display: flex;
+    justify-content: center;
+    padding: 0 12px;
+    pointer-events: none;
+    transition: transform 0.6s var(--ease), opacity 0.4s;
+    animation: drop-in 0.9s var(--ease) 0.2s backwards;
   }
-  .site-header:global(.is-scrolled) {
-    background: color-mix(in srgb, var(--bg) 78%, transparent);
-    backdrop-filter: saturate(1.4) blur(14px);
-    -webkit-backdrop-filter: saturate(1.4) blur(14px);
-    border-bottom-color: var(--line);
-  }
-  .site-header:global(.is-hidden) { transform: translateY(-100%); }
+  @keyframes drop-in { from { opacity: 0; transform: translateY(-24px); } }
+  .site-header:global(.is-hidden) { transform: translateY(-140%); }
 
-  .bar { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
-  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; }
-  .brand-mark {
-    width: 30px;
-    height: 30px;
+  .pill {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg-elev) 72%, transparent);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.08);
+    max-width: 100%;
+    transition: box-shadow 0.4s, border-color 0.4s;
+  }
+  .site-header:global(.is-scrolled) .pill { border-color: var(--line-strong); box-shadow: var(--shadow-hover); }
+
+  .brand {
+    flex: none;
+    width: 34px;
+    height: 34px;
     display: grid;
     place-items: center;
-    border-radius: 8px;
+    border-radius: 50%;
     background: var(--ink);
     color: var(--bg);
     font-family: var(--serif);
     font-size: 18px;
+    line-height: 1;
     transition: background-color 0.4s, transform 0.6s var(--ease);
   }
-  .brand:hover .brand-mark { background: var(--accent); transform: rotate(-8deg); }
-  .brand-name { font-size: 15px; letter-spacing: -0.01em; }
+  .brand:hover { background: var(--accent); transform: rotate(-12deg) scale(1.05); }
 
-  .nav-links { display: flex; gap: 4px; }
+  .sep { flex: none; width: 1px; height: 18px; background: var(--line-strong); margin: 0 4px; }
+
+  .nav-links { position: relative; display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a {
     position: relative;
-    font-size: 14px;
+    z-index: 1;
+    flex: none;
+    font-size: 13.5px;
+    font-weight: 500;
     color: var(--muted);
-    padding: 6px 10px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
     transition: color 0.3s;
   }
-  .nav-links a::after {
-    content: '';
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 2px;
-    height: 1px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.5s var(--ease);
-  }
   .nav-links a:hover, .nav-links a:global(.is-active) { color: var(--ink); }
-  .nav-links a:hover::after, .nav-links a:global(.is-active)::after { transform: scaleX(1); }
+  .glide {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 34px;
+    margin-top: -17px;
+    width: 0;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    opacity: 0;
+    transition: transform 0.5s var(--ease), width 0.5s var(--ease), opacity 0.3s;
+    pointer-events: none;
+  }
 
-  .bar-actions { display: flex; align-items: center; gap: 8px; }
   .theme-toggle {
-    width: 36px;
-    height: 36px;
+    flex: none;
+    width: 34px;
+    height: 34px;
     display: grid;
     place-items: center;
-    border: 1px solid var(--line);
+    border: 0;
     background: transparent;
     color: var(--ink-2);
-    border-radius: 10px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: border-color 0.3s, color 0.3s;
+    transition: color 0.3s, background-color 0.3s, transform 0.5s var(--ease);
   }
-  .theme-toggle:hover { border-color: var(--line-strong); color: var(--accent); }
+  .theme-toggle:hover { color: var(--accent); background: var(--accent-soft); transform: rotate(20deg); }
   .theme-toggle span { display: grid; place-items: center; }
   .i-moon { display: none !important; }
   :global(:root[data-theme='dark']) .i-sun { display: none !important; }
@@ -206,17 +246,6 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
     :global(:root:not([data-theme='light'])) .i-sun { display: none !important; }
     :global(:root:not([data-theme='light'])) .i-moon { display: grid !important; }
   }
-
-  .cv-btn {
-    font-size: 13.5px;
-    font-weight: 500;
-    padding: 7px 14px;
-    border-radius: 10px;
-    background: var(--ink);
-    color: var(--bg);
-    transition: background-color 0.3s, transform 0.4s var(--ease);
-  }
-  .cv-btn:hover { background: var(--accent); color: #fff; }
 
   .site-footer { margin-top: 96px; border-top: 1px solid var(--line); }
   .foot {
@@ -231,10 +260,18 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
   }
   .foot-links { display: flex; gap: 18px; }
 
-  @media (max-width: 860px) {
-    .nav-links { display: none; }
+  @media (max-width: 480px) {
+    .site-header { top: 10px; padding: 0 8px; }
+    .nav-links a { padding: 7px 10px; font-size: 13px; }
+    .sep { margin: 0 2px; }
+    .nav-links a.nav-cv { display: none; }
   }
-  @media (max-width: 380px) {
-    .brand-name { display: none; }
+  @media (max-width: 400px) {
+    .sep { display: none; }
+    .pill { gap: 2px; padding: 5px; }
+    .nav-links a { padding: 7px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header { animation: none; }
   }
 </style>
