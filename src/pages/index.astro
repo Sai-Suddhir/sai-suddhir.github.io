@@ -146,13 +146,19 @@ const md = (s: string) =>
           <h4 class="pub-title">{p.title}</h4>
           <p class="pub-authors" set:html={p.authors} />
           <p class="pub-venue">{p.venue}</p>
+          {(p.pdf || p.page) && (
+            <div class="pub-links">
+              {p.pdf && <a class="pub-btn" href={p.pdf} target="_blank" rel="noopener"><span class="pub-pdf">PDF</span> Read the digest</a>}
+              {p.page && <a class="pub-btn" href={p.page}>Figures &amp; results <Icon name="arrow" size={14} /></a>}
+            </div>
+          )}
         </article>
       ))}
 
       {workGroups.map((g) => (
         <>
           <h3 class="mini-head" data-reveal>{g.label}</h3>
-          <div class={`tiles tiles-${g.key}`} data-stagger="80">
+          <div class={`tiles tiles-${g.key}`} style={`--cols:${Math.max(1, Math.min(3, g.items.filter((w) => w.id !== featuredId).length))}`} data-stagger="80">
             {g.items.map((w) => {
               const d = w.data;
               const meta = [d.role, d.period].filter((m) => m && !isTodo(m)).join(' · ');
@@ -426,9 +432,24 @@ const md = (s: string) =>
   .pub-authors { color: var(--ink-2); margin: 0 0 2px; font-size: 15px; }
   .pub-authors :global(strong) { font-weight: 600; color: var(--ink); }
   .pub-venue { font-style: italic; font-family: var(--serif); font-size: 16.5px; color: var(--muted); margin: 0; }
+  .pub-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .pub-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 7px 14px 7px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    transition: border-color 0.3s, color 0.3s, translate 0.4s var(--ease);
+  }
+  .pub-btn:last-child { padding-left: 14px; }
+  .pub-btn:hover { border-color: var(--accent); color: var(--accent); translate: 0 -1px; }
+  .pub-pdf { font-family: var(--mono); font-size: 10.5px; padding: 2px 6px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
 
-  .tiles { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .tiles-industry { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiles { display: grid; gap: 18px; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
   .tile {
     display: flex;
     flex-direction: column;
@@ -534,7 +555,7 @@ const md = (s: string) =>
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
   }
   @media (max-width: 900px) {
-    .tiles, .tiles-industry { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tiles { grid-template-columns: repeat(min(2, var(--cols, 3)), minmax(0, 1fr)); }
     .tile-featured { flex-direction: column; }
     .tile-featured .tile-media { flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
   }
@@ -542,7 +563,7 @@ const md = (s: string) =>
     .intro-top { padding-bottom: 240px; }
   }
   @media (max-width: 600px) {
-    .tiles, .tiles-industry { grid-template-columns: minmax(0, 1fr); }
+    .tiles { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 560px) {
     .edu li { flex-direction: column; gap: 6px; }

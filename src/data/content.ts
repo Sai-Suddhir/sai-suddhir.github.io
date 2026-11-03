@@ -77,8 +77,10 @@ export const about = {
 export const publications = [
   {
     authors: '<strong>Sai Suddhir A B</strong> and Srikanthan Sridharan',
-    title: 'A Geometric Control Approach for DC-link Voltage Equalization in Split-Capacitor Inverters',
+    title: 'A Geometric Control Approach for DC-Link Voltage Equalization in Split-Capacitor Inverters',
     venue: 'Submitted to ICPE 2027 (under review)',
+    pdf: '/work/ddp/icpe-2027-digest.pdf', // the attached digest
+    page: '/work/ddp/', // project page with figures and results
   },
 ];
 

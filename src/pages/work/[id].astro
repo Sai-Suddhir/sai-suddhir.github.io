@@ -22,7 +22,11 @@ const { Content } = await render(entry);
 
 // Full-size versions for the lightbox
 const gallery = await Promise.all(
-  d.gallery.map(async (g) => ({ ...g, full: (await getImage({ src: g.src, width: 2000 })).src }))
+  d.gallery.map(async (g) => ({
+    ...g,
+    full: (await getImage({ src: g.src, width: 2000 })).src,
+    wide: g.src.width / g.src.height > 1.9, // wide plots span the full row
+  }))
 );
 const coverFull = d.cover ? (await getImage({ src: d.cover, width: 2000 })).src : undefined;
 
@@ -105,9 +109,9 @@ const missing = [
             <h2 class="block-title" data-reveal>Gallery</h2>
             <div class="gallery" data-stagger="80">
               {gallery.map((g) => (
-                <figure data-reveal>
+                <figure class:list={[{ wide: g.wide }]} data-reveal>
                   <button class="zoom" type="button" data-full={g.full} data-caption={g.caption ?? ''} aria-label={`View ${g.caption ?? 'image'} full size`}>
-                    <Image src={g.src} alt={g.caption ?? ''} widths={[400, 700, 1000]} sizes="(max-width: 860px) 100vw, 380px" />
+                    <Image src={g.src} alt={g.caption ?? ''} widths={g.wide ? [700, 1100, 1600] : [400, 700, 1000]} sizes={g.wide ? '(max-width: 860px) 100vw, 760px' : '(max-width: 860px) 100vw, 380px'} />
                   </button>
                   {g.caption && <figcaption>{g.caption}</figcaption>}
                 </figure>
@@ -368,10 +372,11 @@ const missing = [
   .block-title { font-family: var(--serif); font-size: clamp(26px, 3vw, 32px); letter-spacing: -0.01em; margin-bottom: 20px; }
 
   /* gallery */
-  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; align-items: start; }
+  .gallery figure.wide { grid-column: 1 / -1; }
   .gallery figure { margin: 0; }
-  .gallery .zoom { width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-elev); }
-  .gallery :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .gallery .zoom { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+  .gallery :global(img) { width: 100%; height: auto; display: block; }
   .gallery figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 
   /* documents */
@@ -501,6 +506,7 @@ const missing = [
     .quick { display: none; }
   }
   @media (max-width: 560px) {
+    .gallery { grid-template-columns: minmax(0, 1fr); }
     .pager { grid-template-columns: 1fr; }
     .doc-actions { width: 100%; }
   }
