@@ -1,0 +1,378 @@
+---
+// Blueprint-style, interactive drawing of a balanced three-phase system:
+// rotating R-Y-B phasors in the SVPWM hexagon, projected into three sine waves.
+// Drag the phasors to spin them; flick to give them momentum.
+---
+<canvas class="phasor" aria-hidden="true"></canvas>
+
+<style>
+  .phasor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    /* keep the drawing faint where the name and quote sit */
+    --fade: linear-gradient(to bottom, #000 72%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 30% 34% at 52% 40%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.3) 60%, #000 100%), var(--fade);
+    -webkit-mask-composite: source-in;
+    mask-image: radial-gradient(ellipse 30% 34% at 52% 40%, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.3) 60%, #000 100%), var(--fade);
+    mask-composite: intersect;
+  }
+  @media (max-width: 700px) {
+    .phasor {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.18) 52%, #000 66%, #000 92%, transparent 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.18) 52%, #000 66%, #000 92%, transparent 100%);
+    }
+  }
+</style>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('canvas.phasor');
+  const host = canvas?.parentElement;
+  if (canvas && host) init(canvas, host);
+
+  function init(canvas: HTMLCanvasElement, host: HTMLElement) {
+    const ctx = canvas.getContext('2d')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const TAU = Math.PI * 2;
+    const BASE = TAU * 0.11; // rad/s at rest
+
+    let W = 0, H = 0, dpr = 1, mobile = false;
+    let cx = 0, cy = 0, R = 0, x0 = 0, lambda = 0, amp = 0;
+    let theta = 0.6, vel = BASE;
+    let drawIn = 0; // 0 → 1 drafting animation
+    let interacted = false;
+    let t0 = performance.now() + 500; // drafting starts just after the name appears
+    let C = { ink: '#15171c', accent: '#b0532b', bg: '#f6f5f1', dark: false, phase: ['#c0392b', '#b8860b', '#2e6bc6'] };
+
+    const hexToRgb = (hex: string) => {
+      const h = hex.trim().replace('#', '');
+      const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+    const rgba = (hex: string, a: number) => {
+      const [r, g, b] = hexToRgb(hex);
+      return `rgba(${r},${g},${b},${a})`;
+    };
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      const bg = cs.getPropertyValue('--bg').trim() || '#f6f5f1';
+      const [r, g, b] = hexToRgb(bg);
+      const dark = (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.3;
+      C = {
+        ink: cs.getPropertyValue('--ink').trim() || '#15171c',
+        accent: cs.getPropertyValue('--accent').trim() || '#b0532b',
+        bg,
+        dark,
+        // Indian phase colours: R, Y, B
+        phase: dark ? ['#e5675c', '#e3b341', '#5b95e8'] : ['#c0392b', '#b07d0a', '#2763bd'],
+      };
+    }
+
+    function layout() {
+      const r = host.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      mobile = W < 700;
+      if (mobile) {
+        R = 58;
+        cx = R + 26;
+        cy = H - 112;
+        x0 = cx + R + 26;
+        lambda = 230;
+      } else {
+        R = Math.max(105, Math.min(150, H * 0.26));
+        cx = Math.max(R + 64, W * 0.13);
+        cy = H * 0.55;
+        x0 = cx + R + 56;
+        lambda = 460;
+      }
+      amp = R * 0.66;
+    }
+
+    /* ── drawing helpers ── */
+    const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+    function line(x1: number, y1: number, x2: number, y2: number) {
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    function arrow(x1: number, y1: number, x2: number, y2: number, head = 7) {
+      line(x1, y1, x2, y2);
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(a - 0.4), y2 - head * Math.sin(a - 0.4));
+      ctx.lineTo(x2 - head * Math.cos(a + 0.4), y2 - head * Math.sin(a + 0.4));
+      ctx.closePath();
+      ctx.fill();
+    }
+    function text(s: string, x: number, y: number, color: string, align: CanvasTextAlign = 'left', size = 10.5) {
+      ctx.font = `500 ${size}px "DM Mono", ui-monospace, monospace`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.fillText(s, x, y);
+    }
+
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      const p = ease(Math.max(0, drawIn));
+      const ink = (a: number) => rgba(C.ink, a * (C.dark ? 1.15 : 1));
+
+      /* blueprint grid */
+      ctx.lineWidth = 1;
+      const gA = Math.min(1, drawIn * 2.5);
+      for (let x = 0.5; x < W; x += 24) {
+        ctx.strokeStyle = ink((Math.round(x - 0.5) % 120 === 0 ? 0.075 : 0.035) * gA);
+        line(x, 0, x, H);
+      }
+      for (let y = 0.5; y < H; y += 24) {
+        ctx.strokeStyle = ink((Math.round(y - 0.5) % 120 === 0 ? 0.075 : 0.035) * gA);
+        line(0, y, W, y);
+      }
+
+      /* reference circle, axes, ticks, hexagon */
+      ctx.strokeStyle = ink(0.32);
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + TAU * p);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle = ink(0.22);
+      line(cx - R * 1.25 * p, cy, cx + R * 1.25 * p, cy);
+      line(cx, cy - R * 1.25 * p, cx, cy + R * 1.25 * p);
+
+      ctx.strokeStyle = ink(0.3);
+      for (let d = 0; d < 360 * p; d += 15) {
+        const a = (d * Math.PI) / 180;
+        const l = d % 90 === 0 ? 9 : 4;
+        line(cx + R * Math.cos(a), cy - R * Math.sin(a), cx + (R + l) * Math.cos(a), cy - (R + l) * Math.sin(a));
+      }
+
+      if (p > 0.25) {
+        const hp = ease((drawIn - 0.25) / 0.6);
+        ctx.strokeStyle = ink(0.28);
+        ctx.beginPath();
+        for (let k = 0; k <= 6 * hp; k++) {
+          const a = (k * Math.PI) / 3;
+          const x = cx + R * Math.cos(a), y = cy - R * Math.sin(a);
+          k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        if (!mobile && hp > 0.9) {
+          for (let k = 0; k < 6; k++) {
+            const a = (k * Math.PI) / 3;
+            text(`V${k + 1}`, cx + (R + 20) * Math.cos(a), cy - (R + 20) * Math.sin(a) + 3, ink(0.42), 'center', 9.5);
+          }
+        }
+      }
+
+      /* waves + projections */
+      const wavesEnd = x0 + (W - x0) * p;
+      ctx.strokeStyle = ink(0.2);
+      line(x0, cy, wavesEnd, cy);
+      if (p > 0.95) {
+        ctx.fillStyle = ink(0.3);
+        arrow(W - 60, cy, W - 34, cy, 6);
+        text('ωt', W - 40, cy - 8, ink(0.45), 'right');
+      }
+
+      for (let n = 0; n < 3; n++) {
+        const off = (n * TAU) / 3;
+        const ang = theta - off;
+        const tx = cx + amp * Math.cos(ang), ty = cy - amp * Math.sin(ang);
+        const col = C.phase[n];
+
+        // projection to the wave start
+        ctx.strokeStyle = rgba(col, 0.32 * p);
+        ctx.setLineDash([2, 4]);
+        line(tx, ty, x0, ty);
+        ctx.setLineDash([]);
+
+        // wave
+        ctx.strokeStyle = rgba(col, 0.8);
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        for (let x = x0; x <= wavesEnd; x += 3) {
+          const y = cy - amp * Math.sin(ang - (TAU * (x - x0)) / lambda);
+          x === x0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(x0, ty, 2.6, 0, TAU); ctx.fill();
+      }
+
+      /* λ dimension line */
+      if (p > 0.6 && x0 + lambda < W - 40) {
+        const y = cy + amp + 30;
+        ctx.strokeStyle = ink(0.32);
+        ctx.fillStyle = ink(0.32);
+        arrow(x0 + lambda / 2 - 14, y, x0 + 2, y, 5);
+        arrow(x0 + lambda / 2 + 14, y, x0 + lambda - 2, y, 5);
+        line(x0, y - 6, x0, y + 6);
+        line(x0 + lambda, y - 6, x0 + lambda, y + 6);
+        text('T', x0 + lambda / 2, y + 4, ink(0.5), 'center', 11);
+      }
+
+      /* resultant space vector with trail */
+      const res = amp * 1.5;
+      for (let k = 0; k < 24; k++) {
+        const a0 = theta - (k + 1) * 0.04, a1 = theta - k * 0.04;
+        ctx.strokeStyle = rgba(C.accent, 0.55 * (1 - k / 24) * p);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, res, -a1, -a0);
+        ctx.stroke();
+      }
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = rgba(C.accent, 0.9 * p);
+      ctx.fillStyle = rgba(C.accent, 0.9 * p);
+      arrow(cx, cy, cx + res * Math.cos(theta) * p, cy - res * Math.sin(theta) * p, 9);
+      ctx.lineWidth = 1;
+
+      /* phasors */
+      for (let n = 0; n < 3; n++) {
+        const ang = theta - (n * TAU) / 3;
+        const tx = cx + amp * p * Math.cos(ang), ty = cy - amp * p * Math.sin(ang);
+        ctx.strokeStyle = C.phase[n];
+        ctx.fillStyle = C.phase[n];
+        ctx.lineWidth = 1.8;
+        arrow(cx, cy, tx, ty, 7);
+        ctx.lineWidth = 1;
+        text(['R', 'Y', 'B'][n], cx + (amp + 14) * Math.cos(ang), cy - (amp + 14) * Math.sin(ang) + 4, C.phase[n], 'center', 11);
+      }
+      ctx.fillStyle = ink(0.7);
+      ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, TAU); ctx.fill();
+
+      /* 120° marker between R and Y */
+      if (p > 0.9) {
+        ctx.strokeStyle = ink(0.35);
+        ctx.beginPath();
+        ctx.arc(cx, cy, amp * 0.32, -theta, -theta + (TAU / 3));
+        ctx.stroke();
+        const mid = theta - TAU / 6;
+        text('120°', cx + amp * 0.5 * Math.cos(mid), cy - amp * 0.5 * Math.sin(mid) + 3, ink(0.5), 'center', 9.5);
+      }
+
+      /* annotations */
+      if (p > 0.5) {
+        const a = ease((drawIn - 0.5) / 0.5);
+        const deg = (((theta * 180) / Math.PI) % 360 + 360) % 360;
+        const f = Math.abs(vel) / TAU;
+        text('FIG. 01   BALANCED THREE-PHASE SYSTEM · R–Y–B', cx - R, cy - R - 30, ink(0.5 * a));
+        text(`θ = ${deg.toFixed(1).padStart(5, ' ')}°    f = ${f.toFixed(2)} Hz`, cx - R, cy + R + 34, ink(0.5 * a));
+        if (!interacted) {
+          const pulse = 0.45 + 0.35 * Math.sin(performance.now() / 500);
+          text('↻ drag the phasors', cx - R, cy + R + 52, rgba(C.accent, pulse * a));
+        }
+      }
+    }
+
+    /* ── interaction: grab and spin ── */
+    let dragging = false, grabOffset = 0, lastAng = 0, lastT = 0, dragVel = 0;
+    const local = (e: PointerEvent | Touch) => {
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+    const onWheel = (x: number, y: number) => Math.hypot(x - cx, y - cy) < R * 1.2;
+    const angleAt = (x: number, y: number) => Math.atan2(cy - y, x - cx);
+
+    host.addEventListener('pointermove', (e) => {
+      const { x, y } = local(e);
+      if (dragging) {
+        const a = angleAt(x, y);
+        let d = a - lastAng;
+        if (d > Math.PI) d -= TAU;
+        if (d < -Math.PI) d += TAU;
+        const now = performance.now();
+        const dt = Math.max(1, now - lastT) / 1000;
+        dragVel = dragVel * 0.6 + (d / dt) * 0.4;
+        theta += d;
+        lastAng = a;
+        lastT = now;
+        if (reduce) draw();
+      } else if (e.pointerType === 'mouse') {
+        host.style.cursor = onWheel(x, y) ? 'grab' : '';
+      }
+    });
+    host.addEventListener('pointerdown', (e) => {
+      const { x, y } = local(e);
+      if (!onWheel(x, y) || (e.target as HTMLElement).closest('a, button')) return;
+      e.preventDefault(); // don't start a text selection
+      dragging = true;
+      interacted = true;
+      document.documentElement.style.userSelect = 'none';
+      lastAng = angleAt(x, y);
+      lastT = performance.now();
+      dragVel = 0;
+      host.setPointerCapture(e.pointerId);
+      host.style.cursor = 'grabbing';
+    });
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      document.documentElement.style.userSelect = '';
+      vel = Math.max(-TAU * 2, Math.min(TAU * 2, dragVel));
+      host.style.cursor = '';
+    };
+    host.addEventListener('pointerup', release);
+    host.addEventListener('pointercancel', release);
+    // on touch screens, grabbing the wheel shouldn't scroll the page
+    host.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      const { x, y } = local(t);
+      if (onWheel(x, y)) e.preventDefault();
+    }, { passive: false });
+
+    /* ── loop ── */
+    let running = false, raf = 0, last = 0;
+    function frame(now: number) {
+      raf = 0;
+      if (!running) return;
+      const dt = Math.min(0.05, (now - last) / 1000 || 0);
+      last = now;
+      if (drawIn < 1) drawIn = Math.max(0, Math.min(1, (now - t0) / 2200));
+      if (!dragging) {
+        vel += (BASE - vel) * Math.min(1, dt * 0.9);
+        theta += vel * dt;
+      }
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+    function setRunning(on: boolean) {
+      running = on && !reduce;
+      if (running && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    }
+
+    let visible = true;
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; setRunning(visible && !document.hidden); }).observe(host);
+    document.addEventListener('visibilitychange', () => setRunning(visible && !document.hidden));
+
+    let lastW = 0, t = 0;
+    new ResizeObserver(() => {
+      const w = Math.round(host.getBoundingClientRect().width);
+      const h = Math.round(host.getBoundingClientRect().height);
+      if (w === lastW && Math.abs(h - H) < 40 && W) return;
+      lastW = w;
+      clearTimeout(t);
+      t = window.setTimeout(() => { layout(); draw(); }, 120);
+    }).observe(host);
+
+    const recolor = () => { readColors(); draw(); };
+    new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolor);
+
+    readColors();
+    layout();
+    if (reduce) drawIn = 1;
+    draw();
+    document.fonts?.ready.then(draw);
+    setRunning(true);
+  }
+</script>

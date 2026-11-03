@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import Strings from '../components/Strings.astro';
+import Phasor from '../components/Phasor.astro';
 import Todo from '../components/Todo.astro';
 import profilePhoto from '../assets/profile.jpg';
 import {
@@ -30,7 +30,7 @@ const md = (s: string) =>
   <!-- ───────── Home: name, quote, photo, who I am ───────── -->
   <section class="intro" id="top">
     <div class="intro-top">
-      <Strings />
+      <Phasor />
       <div class="container intro-head">
         <h1 class="name" aria-label={profile.name}>
           {nameLetters.map((word) => (
@@ -270,23 +270,9 @@ const md = (s: string) =>
   .intro { position: relative; padding-bottom: clamp(24px, 4vw, 48px); }
   .intro-top {
     position: relative;
-    padding: clamp(120px, 17vh, 170px) 0 clamp(56px, 8vh, 88px);
+    padding: clamp(130px, 19vh, 190px) 0 clamp(90px, 13vh, 130px);
     overflow: hidden;
   }
-  .intro-top::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 40%;
-    width: min(900px, 120vw);
-    height: 420px;
-    translate: -50% -50%;
-    background: radial-gradient(closest-side, var(--accent-soft), transparent 75%);
-    filter: blur(20px);
-    pointer-events: none;
-    animation: breathe 9s ease-in-out infinite alternate;
-  }
-  @keyframes breathe { to { opacity: 0.55; transform: scale(1.06); } }
   .intro-head { position: relative; z-index: 1; text-align: center; }
 
   .name {
@@ -342,28 +328,18 @@ const md = (s: string) =>
     align-items: center;
     max-width: 1000px;
   }
-  .me { margin: 0; position: relative; }
-  .me::before {
-    content: '';
-    position: absolute;
-    inset: 14px -14px -14px 14px;
-    border: 1px solid color-mix(in srgb, var(--accent) 75%, transparent);
-    border-radius: 999px 999px 26px 26px;
-    transition: transform 0.9s var(--ease);
-    pointer-events: none;
-  }
-  .me:hover::before { transform: translate(-6px, -6px); }
+  .me { margin: 0; }
   .me-frame {
-    position: relative;
     display: block;
     aspect-ratio: 4 / 5;
-    border-radius: 999px 999px 26px 26px;
+    border-radius: 22px;
     overflow: hidden;
     background: var(--line);
+    border: 1px solid var(--line);
     box-shadow: var(--shadow-hover);
   }
   .me-frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 1.4s var(--ease); }
-  .me:hover .me-frame :global(img) { transform: scale(1.035); }
+  .me:hover .me-frame :global(img) { transform: scale(1.03); }
 
   .intro-text p { font-size: clamp(17px, 1.6vw, 19px); line-height: 1.8; color: var(--ink-2); margin: 0 0 1.1em; }
   .intro-text p :global(strong) { color: var(--ink); font-weight: 600; }
@@ -559,6 +535,9 @@ const md = (s: string) =>
     .bg-grid { grid-template-columns: minmax(0, 1fr); }
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
+  }
+  @media (max-width: 700px) {
+    .intro-top { padding-bottom: 240px; }
   }
   @media (max-width: 560px) {
     .row { grid-template-columns: 56px minmax(0, 1fr) 18px; gap: 14px; padding: 10px 14px 10px 10px; }
