@@ -1,0 +1,510 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Todo from '../../components/Todo.astro';
+import { isTodo, profile } from '../../data/content';
+import { getWork, groupLabel, fileUrl, isYouTube, type Work } from '../../lib/work';
+
+export async function getStaticPaths() {
+  const all = await getWork();
+  return all.map((entry, i) => ({
+    params: { id: entry.id },
+    props: { entry, prev: all[i - 1] ?? null, next: all[i + 1] ?? null },
+  }));
+}
+
+interface Props { entry: Work; prev: Work | null; next: Work | null }
+const { entry, prev, next } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+
+// Full-size versions for the lightbox
+const gallery = await Promise.all(
+  d.gallery.map(async (g) => ({ ...g, full: (await getImage({ src: g.src, width: 2000 })).src }))
+);
+const coverFull = d.cover ? (await getImage({ src: d.cover, width: 2000 })).src : undefined;
+
+const facts = [
+  { k: 'Role', v: d.role },
+  { k: 'Organisation', v: d.org },
+  { k: 'Period', v: d.period },
+  { k: 'Advisor', v: d.advisor },
+  { k: 'Status', v: d.status },
+].filter((f) => f.v);
+
+const kindLabel: Record<string, string> = {
+  slides: 'Slides', report: 'Report', schematic: 'Schematic', paper: 'Paper', poster: 'Poster', other: 'Document',
+};
+
+const sections = [
+  { id: 'overview', label: 'Overview', show: true },
+  { id: 'gallery', label: 'Gallery', show: gallery.length > 0 },
+  { id: 'documents', label: 'Documents', show: d.documents.length > 0 },
+  { id: 'video', label: 'Video', show: !!d.video },
+  { id: 'code', label: 'Code & links', show: d.code.length + d.links.length > 0 },
+].filter((s) => s.show);
+
+const missing = [
+  !d.cover && 'a cover image',
+  !gallery.length && 'gallery images (PCB renders, photos, plots)',
+  !d.documents.length && 'documents (slides, report, schematic)',
+  !d.code.length && 'code repositories',
+].filter(Boolean) as string[];
+---
+<Base title={`${d.title} · ${profile.name}`} description={d.oneLiner}>
+  <article class="proj">
+    <!-- ───── Header ───── -->
+    <header class="proj-head container">
+      <a class="back link" href="/#work"><span aria-hidden="true">←</span> All work</a>
+      <p class="eyebrow proj-fade" style="--h:0">{groupLabel(d.group)}</p>
+      <h1 class="proj-title proj-fade" style={`--h:1; view-transition-name: work-${entry.id}`}>{d.title}</h1>
+      <p class="proj-lead proj-fade" style="--h:2">{d.oneLiner}</p>
+
+      <dl class="facts proj-fade" style="--h:3">
+        {facts.map((f) => (
+          <div>
+            <dt>{f.k}</dt>
+            <dd>{isTodo(f.v) ? <Todo text={f.v} /> : f.v}</dd>
+          </div>
+        ))}
+      </dl>
+      {d.tags.length > 0 && (
+        <div class="tag-list proj-fade" style="--h:4">{d.tags.map((t) => <span class="tag">{t}</span>)}</div>
+      )}
+    </header>
+
+    {d.cover && (
+      <figure class="cover container proj-fade" style="--h:5">
+        <button class="zoom" type="button" data-full={coverFull} data-caption={d.coverAlt ?? d.title} aria-label="View full size">
+          <Image src={d.cover} alt={d.coverAlt ?? d.title} widths={[640, 1000, 1400]} sizes="(max-width: 1100px) 100vw, 1080px" loading="eager" />
+        </button>
+      </figure>
+    )}
+
+    {d.highlights.length > 0 && (
+      <div class="container">
+        <ul class="hl" data-stagger="100">
+          {d.highlights.map((h) => (
+            <li data-reveal><span class="hl-v">{h.value}</span><span class="hl-l">{h.label}</span></li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- ───── Body ───── -->
+    <div class="container layout">
+      <div class="main">
+        <section id="overview" class="prose" data-reveal>
+          <Content />
+        </section>
+
+        {gallery.length > 0 && (
+          <section id="gallery" class="block">
+            <h2 class="block-title" data-reveal>Gallery</h2>
+            <div class="gallery" data-stagger="80">
+              {gallery.map((g) => (
+                <figure data-reveal>
+                  <button class="zoom" type="button" data-full={g.full} data-caption={g.caption ?? ''} aria-label={`View ${g.caption ?? 'image'} full size`}>
+                    <Image src={g.src} alt={g.caption ?? ''} widths={[400, 700, 1000]} sizes="(max-width: 860px) 100vw, 380px" />
+                  </button>
+                  {g.caption && <figcaption>{g.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {d.documents.length > 0 && (
+          <section id="documents" class="block">
+            <h2 class="block-title" data-reveal>Documents</h2>
+            <div class="docs" data-stagger="80">
+              {d.documents.map((doc, i) => {
+                const url = fileUrl(entry.id, doc.file);
+                return (
+                  <div class="doc card" data-reveal>
+                    <div class="doc-row">
+                      <span class="doc-icon" aria-hidden="true">PDF</span>
+                      <div class="doc-text">
+                        <p class="doc-title">{doc.title}</p>
+                        <p class="doc-meta">{kindLabel[doc.kind]}{doc.note && ` · ${doc.note}`}</p>
+                      </div>
+                      <div class="doc-actions">
+                        <button class="btn btn-sm doc-preview" type="button" data-target={`doc-${i}`} aria-expanded="false">Preview</button>
+                        <a class="btn btn-sm" href={url} target="_blank" rel="noopener">Open</a>
+                        <a class="btn btn-sm btn-icon" href={url} download aria-label={`Download ${doc.title}`}><Icon name="download" size={15} /></a>
+                      </div>
+                    </div>
+                    <div class="doc-viewer" id={`doc-${i}`} hidden data-src={`${url}#view=FitH`}></div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {d.video && (
+          <section id="video" class="block">
+            <h2 class="block-title" data-reveal>Video</h2>
+            <div class="video" data-reveal>
+              {isYouTube(d.video)
+                ? <iframe src={`https://www.youtube-nocookie.com/embed/${d.video}`} title={`${d.title} video`} loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+                : <video src={fileUrl(entry.id, d.video)} controls preload="metadata"></video>}
+            </div>
+          </section>
+        )}
+
+        {(d.code.length > 0 || d.links.length > 0) && (
+          <section id="code" class="block">
+            <h2 class="block-title" data-reveal>Code &amp; links</h2>
+            <div class="repos" data-stagger="80">
+              {d.code.map((c) => (
+                <a class="repo card" href={c.url} target="_blank" rel="noopener" data-reveal>
+                  <Icon name="github" size={20} />
+                  <span class="repo-text">
+                    <span class="repo-title">{c.title}</span>
+                    {c.description && <span class="repo-desc">{c.description}</span>}
+                  </span>
+                  <Icon name="arrow" size={16} />
+                </a>
+              ))}
+              {d.links.map((l) => (
+                <a class="repo card" href={l.url} target="_blank" rel="noopener" data-reveal>
+                  <Icon name="arrow" size={20} />
+                  <span class="repo-text"><span class="repo-title">{l.label}</span></span>
+                  <Icon name="arrow" size={16} />
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {import.meta.env.DEV && missing.length > 0 && (
+          <aside class="todo-box">
+            <p><strong>Preview only:</strong> this project has no {missing.join(', ')} yet.</p>
+            <p>Add images to <code>src/content/work/{entry.id}/</code> and PDFs to <code>public/work/{entry.id}/</code>, then list them in <code>index.md</code>. See the README for the format.</p>
+          </aside>
+        )}
+      </div>
+
+      <aside class="side">
+        <div class="side-inner">
+          {sections.length > 1 && (
+            <nav class="toc" aria-label="On this page">
+              <p class="side-label">On this page</p>
+              {sections.map((s) => <a href={`#${s.id}`}>{s.label}</a>)}
+            </nav>
+          )}
+          {(d.documents.length > 0 || d.code.length > 0) && (
+            <div class="quick">
+              <p class="side-label">Resources</p>
+              {d.documents.map((doc) => (
+                <a href={fileUrl(entry.id, doc.file)} target="_blank" rel="noopener"><span class="q-kind">{kindLabel[doc.kind]}</span>{doc.title}</a>
+              ))}
+              {d.code.map((c) => (
+                <a href={c.url} target="_blank" rel="noopener"><span class="q-kind">Code</span>{c.title}</a>
+              ))}
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+
+    <!-- ───── Prev / next ───── -->
+    <nav class="container pager" aria-label="More work">
+      {prev ? (
+        <a class="pager-link card" href={`/work/${prev.id}/`}>
+          <span class="pager-dir">← Previous</span>
+          <span class="pager-title">{prev.data.title}</span>
+        </a>
+      ) : <span></span>}
+      {next ? (
+        <a class="pager-link card next" href={`/work/${next.id}/`}>
+          <span class="pager-dir">Next →</span>
+          <span class="pager-title">{next.data.title}</span>
+        </a>
+      ) : <span></span>}
+    </nav>
+  </article>
+
+  <!-- Lightbox -->
+  <dialog class="lightbox" aria-label="Image viewer">
+    <button class="lb-close" type="button" aria-label="Close">×</button>
+    <button class="lb-nav lb-prev" type="button" aria-label="Previous image">‹</button>
+    <figure>
+      <img alt="" />
+      <figcaption></figcaption>
+    </figure>
+    <button class="lb-nav lb-next" type="button" aria-label="Next image">›</button>
+  </dialog>
+</Base>
+
+<script>
+  // PDF previews
+  document.querySelectorAll<HTMLButtonElement>('.doc-preview').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const box = document.getElementById(btn.dataset.target!)!;
+      const open = box.hidden;
+      if (open && !box.firstChild) {
+        const f = document.createElement('iframe');
+        f.src = box.dataset.src!;
+        f.title = 'Document preview';
+        f.loading = 'lazy';
+        box.appendChild(f);
+      }
+      box.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Hide' : 'Preview';
+    });
+  });
+
+  // Lightbox
+  const dlg = document.querySelector<HTMLDialogElement>('dialog.lightbox')!;
+  const img = dlg.querySelector('img')!;
+  const cap = dlg.querySelector('figcaption')!;
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>('button.zoom'));
+  let cur = 0;
+  const show = (i: number) => {
+    cur = (i + items.length) % items.length;
+    const b = items[cur];
+    img.src = b.dataset.full!;
+    img.alt = b.dataset.caption || '';
+    cap.textContent = b.dataset.caption || '';
+    dlg.classList.toggle('single', items.length < 2);
+  };
+  items.forEach((b, i) =>
+    b.addEventListener('click', () => {
+      show(i);
+      dlg.showModal();
+    })
+  );
+  dlg.querySelector('.lb-close')!.addEventListener('click', () => dlg.close());
+  dlg.querySelector('.lb-prev')!.addEventListener('click', () => show(cur - 1));
+  dlg.querySelector('.lb-next')!.addEventListener('click', () => show(cur + 1));
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(cur - 1);
+    if (e.key === 'ArrowRight') show(cur + 1);
+  });
+</script>
+
+<style>
+  .proj { padding-top: 104px; }
+
+  /* header */
+  .back { display: flex; width: fit-content; gap: 8px; font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+  .proj-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(34px, 5.4vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 14px 0 16px;
+    max-width: 900px;
+  }
+  .proj-lead { font-size: clamp(17px, 2vw, 21px); color: var(--ink-2); max-width: 720px; margin-bottom: 30px; }
+  .proj-fade { opacity: 0; transform: translateY(12px); animation: p-in 0.9s var(--ease) forwards; animation-delay: calc(0.05s + var(--h) * 0.08s); }
+  @keyframes p-in { to { opacity: 1; transform: none; } }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0;
+    margin: 0 0 22px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .facts div { padding: 14px 18px 14px 0; }
+  .facts dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .facts dd { margin: 0; font-size: 14.5px; }
+
+  /* cover */
+  .cover { margin: 40px auto 0; }
+  .cover .zoom {
+    width: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-hover);
+    background: var(--bg-elev);
+    max-height: 560px;
+  }
+  .cover :global(img) { width: 100%; max-height: 560px; object-fit: contain; }
+
+  .zoom { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .zoom :global(img) { transition: transform 1s var(--ease); }
+  .zoom:hover :global(img) { transform: scale(1.025); }
+
+  /* highlights */
+  .hl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .hl li { padding: 24px 20px 22px 0; }
+  .hl-v { display: block; font-family: var(--serif); font-size: clamp(30px, 3.6vw, 42px); line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .hl-l { display: block; color: var(--muted); font-size: 13.5px; max-width: 240px; }
+
+  /* layout */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: clamp(32px, 6vw, 80px); margin-top: 56px; }
+  .side-inner { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 28px; }
+  .side-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .toc, .quick { display: flex; flex-direction: column; }
+  .toc a, .quick a {
+    font-size: 14px;
+    color: var(--ink-2);
+    padding: 6px 0 6px 12px;
+    border-left: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .toc a:hover, .quick a:hover { color: var(--accent); border-color: var(--accent); }
+  .q-kind { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .block { margin-top: 64px; scroll-margin-top: 88px; }
+  #overview { scroll-margin-top: 88px; }
+  .block-title { font-family: var(--serif); font-size: clamp(26px, 3vw, 32px); letter-spacing: -0.01em; margin-bottom: 20px; }
+
+  /* gallery */
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .gallery figure { margin: 0; }
+  .gallery .zoom { width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-elev); }
+  .gallery :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .gallery figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+  /* documents */
+  .docs { display: flex; flex-direction: column; gap: 12px; }
+  .doc { padding: 16px 18px; }
+  .doc:hover { transform: none; }
+  .doc-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .doc-icon {
+    flex: none;
+    width: 44px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px 14px 6px 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .doc-text { flex: 1; min-width: 160px; }
+  .doc-title { margin: 0; font-weight: 600; }
+  .doc-meta { margin: 0; font-size: 13px; color: var(--muted); }
+  .doc-actions { display: flex; gap: 8px; }
+  .doc-viewer { margin-top: 16px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); height: min(78vh, 900px); background: var(--bg); }
+  .doc-viewer :global(iframe) { width: 100%; height: 100%; border: 0; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg-elev);
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.3s, color 0.3s, transform 0.4s var(--ease);
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .btn-sm { font-size: 13px; padding: 7px 12px; }
+  .btn-icon { padding: 7px 9px; }
+
+  /* video */
+  .video { aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+  .video iframe, .video video { width: 100%; height: 100%; border: 0; }
+
+  /* code */
+  .repos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .repo { display: flex; align-items: center; gap: 14px; padding: 16px 18px; color: var(--ink-2); }
+  .repo-text { flex: 1; display: flex; flex-direction: column; }
+  .repo-title { font-weight: 600; color: var(--ink); }
+  .repo-desc { font-size: 13.5px; color: var(--muted); }
+  .repo:hover .repo-title { color: var(--accent); }
+
+  .todo-box {
+    margin-top: 48px;
+    padding: 16px 20px;
+    border: 1px dashed #c99a00;
+    background: rgba(255, 200, 0, 0.08);
+    border-radius: 12px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .todo-box p { margin: 0 0 6px; }
+  .todo-box code { font-family: var(--mono); font-size: 12.5px; }
+
+  /* pager */
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 96px; }
+  .pager-link { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; }
+  .pager-link.next { text-align: right; }
+  .pager-dir { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .pager-title { font-family: var(--serif); font-size: 20px; line-height: 1.25; }
+  .pager-link:hover .pager-title { color: var(--accent); }
+
+  /* lightbox */
+  .lightbox {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(8, 9, 11, 0.92);
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox[open] { display: flex; animation: lb-in 0.35s var(--ease); }
+  .lightbox::backdrop { background: transparent; }
+  @keyframes lb-in { from { opacity: 0; } }
+  .lightbox figure { margin: 0; max-width: 92vw; max-height: 88vh; display: flex; flex-direction: column; align-items: center; gap: 12px; pointer-events: none; }
+  .lightbox img { max-width: 92vw; max-height: 80vh; object-fit: contain; border-radius: 8px; animation: lb-img 0.5s var(--ease); pointer-events: auto; }
+  @keyframes lb-img { from { transform: scale(0.96); opacity: 0; } }
+  .lightbox figcaption { font-size: 14px; opacity: 0.8; }
+  .lb-close, .lb-nav {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .lb-close:hover, .lb-nav:hover { background: rgba(255, 255, 255, 0.18); }
+  .lb-close { top: 20px; right: 20px; }
+  .lb-prev { left: 20px; top: 50%; translate: 0 -50%; }
+  .lb-next { right: 20px; top: 50%; translate: 0 -50%; }
+  .lightbox.single .lb-nav { display: none; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .side { order: -1; }
+    .side-inner { position: static; flex-direction: row; flex-wrap: wrap; gap: 24px; }
+    .toc { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; }
+    .toc a { border-left: 0; padding: 4px 0; }
+    .quick { display: none; }
+  }
+  @media (max-width: 560px) {
+    .pager { grid-template-columns: 1fr; }
+    .doc-actions { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .proj-fade { opacity: 1; transform: none; animation: none; }
+  }
+</style>

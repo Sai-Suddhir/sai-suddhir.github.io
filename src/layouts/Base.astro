@@ -17,6 +17,9 @@ const nav = [
   { href: '#contact', label: 'Contact' },
 ];
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// On project pages, section links must point back to the home page
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
+const here = (hash: string) => (isHome ? hash : '/' + hash);
 ---
 <!doctype html>
 <html lang="en">
@@ -53,12 +56,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
     <header class="site-header">
       <div class="container bar">
-        <a href="#top" class="brand" aria-label="Back to top">
+        <a href={isHome ? '#top' : '/'} class="brand" aria-label={isHome ? 'Back to top' : 'Home'}>
           <span class="brand-mark">S</span>
           <span class="brand-name">{profile.name}</span>
         </a>
         <nav class="nav-links" aria-label="Sections">
-          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+          {nav.map((n) => <a href={here(n.href)}>{n.label}</a>)}
         </nav>
         <div class="bar-actions">
           <button class="theme-toggle" type="button" aria-label="Toggle dark mode">

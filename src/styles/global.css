@@ -182,3 +182,41 @@ html:not(.js) [data-reveal] { opacity: 1; transform: none; }
   }
   [data-reveal] { opacity: 1; transform: none; }
 }
+
+/* ───────────── Long-form text (project pages) ───────────── */
+.prose { font-size: 17px; line-height: 1.75; color: var(--ink-2); max-width: 700px; }
+.prose > :first-child { margin-top: 0; }
+.prose h2 {
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.8vw, 30px);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 48px 0 14px;
+}
+.prose h3 { font-size: 18px; font-weight: 600; color: var(--ink); margin: 32px 0 10px; }
+.prose p { margin: 0 0 1.1em; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.prose ul, .prose ol { margin: 0 0 1.2em; padding: 0; }
+.prose ul li { position: relative; padding-left: 20px; margin-bottom: 8px; }
+.prose ul li::before { content: ''; position: absolute; left: 0; top: 0.85em; width: 9px; border-top: 1px solid var(--accent); }
+.prose ol { padding-left: 1.3em; list-style: decimal; }
+.prose ol li { margin-bottom: 8px; padding-left: 4px; }
+.prose code { font-family: var(--mono); font-size: 0.88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; }
+.prose img { border-radius: 12px; border: 1px solid var(--line); margin: 8px 0 20px; }
+.prose blockquote { margin: 0 0 1.2em; padding: 4px 0 4px 18px; border-left: 2px solid var(--accent); font-family: var(--serif); font-size: 19px; color: var(--ink); }
+.prose table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 1.4em; }
+.prose th, .prose td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.prose th { color: var(--ink); font-weight: 600; }
+
+/* ───────────── Page transitions ───────────── */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+::view-transition-old(root) { animation: vt-out 0.28s var(--ease) both; }
+::view-transition-new(root) { animation: vt-in 0.55s var(--ease) both; }
+::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: var(--ease); }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

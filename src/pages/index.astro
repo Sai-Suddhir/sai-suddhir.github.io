@@ -1,19 +1,17 @@
 ---
 import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import CircuitBoard from '../components/CircuitBoard.astro';
 import Todo from '../components/Todo.astro';
 import profilePhoto from '../assets/profile.jpg';
 import {
-  isTodo, profile, about, publications, research, projects, industry,
-  teaching, coursework, tools, contact,
+  isTodo, profile, about, publications, teaching, coursework, tools, contact,
 } from '../data/content';
-import type { WorkItem } from '../data/content';
+import { getWork, GROUPS, resourceSummary } from '../lib/work';
 
-const assets = import.meta.glob<{ default: ImageMetadata }>('../assets/*.{png,jpg,jpeg,webp}', { eager: true });
-const img = (name?: string) => (name ? assets[`../assets/${name}`]?.default : undefined);
+const work = await getWork();
+const workGroups = GROUPS.map((g) => ({ label: g.label, items: work.filter((w) => w.data.group === g.key) })).filter((g) => g.items.length);
 
 // keep trailing initials together (e.g. 'A B') so they never wrap apart
 const nameWords = profile.name.replace(/((?:\s[A-Z]\.?)+)$/, (m) => ' ' + m.trim().replace(/\s/g, ' ')).split(' ');
@@ -22,11 +20,6 @@ const nameWords = profile.name.replace(/((?:\s[A-Z]\.?)+)$/, (m) => ' ' + m.trim
 const md = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-const workGroups: { label: string; items: WorkItem[] }[] = [
-  { label: 'Research', items: research },
-  { label: 'Projects', items: projects },
-  { label: 'Industry', items: industry },
-];
 ---
 <Base>
   <!-- ───────── Home ───────── -->
@@ -136,7 +129,7 @@ const workGroups: { label: string; items: WorkItem[] }[] = [
       <div class="section-head" data-reveal>
         <span class="eyebrow">Work</span>
         <h2 class="section-title">Research &amp; projects</h2>
-        <p class="section-sub">Click any item to see the details.</p>
+        <p class="section-sub">Each item opens a full page with images, documents and code.</p>
       </div>
 
       <h3 class="mini-head" data-reveal>Publication</h3>
@@ -152,40 +145,27 @@ const workGroups: { label: string; items: WorkItem[] }[] = [
         <>
           <h3 class="mini-head" data-reveal>{g.label}</h3>
           <div class="rows" data-stagger="60">
-            {g.items.map((it) => {
-              const src = img(it.image);
-              const metaParts = it.meta.split(' · ');
+            {g.items.map((w) => {
+              const d = w.data;
+              const meta = [d.role, d.period].filter((m) => m && !isTodo(m)).join(' · ');
+              const res = resourceSummary(w);
               return (
-                <details class="row" id={`work-${it.id}`} data-reveal>
-                  <summary>
-                    <span class="row-main">
-                      <span class="row-title">{it.title}</span>
-                      <span class="row-one">{it.oneLiner}</span>
-                    </span>
-                    <span class="row-meta">
-                      {metaParts.map((m, i) => (
-                        isTodo(m) ? <Todo text={m} /> : <span>{i > 0 && ' · '}{m}</span>
-                      ))}
-                    </span>
-                    <span class="row-icon" aria-hidden="true"></span>
-                  </summary>
-                  <div class="row-body">
-                    <div class="row-inner">
-                      {it.advisor && (isTodo(it.advisor)
-                        ? <p class="advisor">Advisor: <Todo text={it.advisor} /></p>
-                        : <p class="advisor">Advisor: {it.advisor}, IIT Madras</p>)}
-                      <div class:list={['row-content', { 'has-media': !!src }]}>
-                        <ul class="bullets">{it.points.map((pt) => <li>{pt}</li>)}</ul>
-                        {src && (
-                          <figure class="row-media">
-                            <Image src={src} alt={it.imageAlt ?? ''} widths={[400, 700]} sizes="(max-width: 760px) 100vw, 340px" />
-                          </figure>
-                        )}
-                      </div>
-                      <div class="tag-list">{it.tags.map((t) => <span class="tag">{t}</span>)}</div>
-                    </div>
-                  </div>
-                </details>
+                <a class="row" href={`/work/${w.id}/`} data-reveal>
+                  {d.cover
+                    ? <span class="row-thumb"><Image src={d.cover} alt="" widths={[120, 240]} sizes="96px" /></span>
+                    : <span class="row-thumb row-thumb-empty" aria-hidden="true">{d.title.charAt(0)}</span>}
+                  <span class="row-main">
+                    <span class="row-title" style={`view-transition-name: work-${w.id}`}>{d.title}</span>
+                    <span class="row-one">{d.oneLiner}</span>
+                    {(meta || res.length > 0) && (
+                      <span class="row-meta">
+                        {meta}
+                        {res.length > 0 && <span class="row-res">{res.join(' · ')}</span>}
+                      </span>
+                    )}
+                  </span>
+                  <span class="row-arrow" aria-hidden="true"><Icon name="arrow" size={18} /></span>
+                </a>
               );
             })}
           </div>
@@ -556,49 +536,44 @@ const workGroups: { label: string; items: WorkItem[] }[] = [
 
   .rows { display: flex; flex-direction: column; gap: 10px; }
   .row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) 24px;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 20px 12px 12px;
     background: var(--bg-elev);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     transition: border-color 0.35s, box-shadow 0.5s var(--ease), opacity 0.9s var(--ease), transform 0.9s var(--ease);
   }
-  .row:hover { border-color: var(--line-strong); }
-  .row[open] { border-color: var(--line-strong); box-shadow: var(--shadow); }
-  .row summary {
-    list-style: none;
+  .row:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+  .row-thumb {
+    width: 76px;
+    height: 60px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .row-thumb :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease); }
+  .row:hover .row-thumb :global(img) { transform: scale(1.08); }
+  .row-thumb-empty {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto 20px;
-    align-items: center;
-    gap: 18px;
-    padding: 18px 22px;
-    cursor: pointer;
+    place-items: center;
+    font-family: var(--serif);
+    font-size: 26px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 22%, transparent);
   }
-  .row summary::-webkit-details-marker { display: none; }
   .row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .row-title { font-weight: 600; font-size: 16.5px; letter-spacing: -0.01em; transition: color 0.3s; }
-  .row:hover .row-title, .row[open] .row-title { color: var(--accent); }
-  .row-one { color: var(--muted); font-size: 14.5px; }
-  .row-meta { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
-  .row-icon { position: relative; width: 14px; height: 14px; justify-self: end; }
-  .row-icon::before, .row-icon::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 14px;
-    height: 0;
-    border-top: 1.5px solid var(--ink-2);
-    transition: transform 0.45s var(--ease), border-color 0.3s;
-  }
-  .row-icon::after { transform: rotate(90deg); }
-  .row[open] .row-icon::after { transform: rotate(0deg); }
-  .row:hover .row-icon::before, .row:hover .row-icon::after { border-color: var(--accent); }
-  .row-body { overflow: hidden; }
-  .row-inner { padding: 0 22px 20px; border-top: 1px solid var(--line); margin: 0 22px; padding: 16px 0 20px; }
-  .advisor { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
-  .row-content.has-media { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
-  .row-content .bullets { font-size: 15px; margin-bottom: 14px; }
-  .row-media { margin: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 3; }
-  .row-media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .row-title { font-weight: 600; font-size: 16.5px; letter-spacing: -0.01em; transition: color 0.3s; width: fit-content; }
+  .row:hover .row-title { color: var(--accent); }
+  .row-one { color: var(--ink-2); font-size: 14.5px; }
+  .row-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .row-res { color: var(--accent); }
+  .row-arrow { color: var(--muted); transition: transform 0.5s var(--ease), color 0.3s; }
+  .row:hover .row-arrow { color: var(--accent); transform: translate(3px, -3px); }
 
   /* ── Academics ── */
   .kit { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 48px; }
@@ -673,14 +648,10 @@ const workGroups: { label: string; items: WorkItem[] }[] = [
     .portrait { position: relative; top: 0; max-width: 260px; }
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
-    .row-content.has-media { grid-template-columns: minmax(0, 1fr); }
-    .row-media { max-width: 420px; }
   }
   @media (max-width: 560px) {
-    .row summary { grid-template-columns: minmax(0, 1fr) 16px; padding: 16px 18px; gap: 12px; }
-    .row-meta { grid-column: 1; grid-row: 2; text-align: left; }
-    .row-icon { grid-column: 2; grid-row: 1; }
-    .row-inner { margin: 0 18px; }
+    .row { grid-template-columns: 56px minmax(0, 1fr) 18px; gap: 14px; padding: 10px 14px 10px 10px; }
+    .row-thumb { width: 56px; height: 48px; }
     .edu li { flex-direction: column; gap: 6px; }
     .edu-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: 12px; }
     .kit-list div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
