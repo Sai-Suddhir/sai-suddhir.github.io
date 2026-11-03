@@ -18,7 +18,7 @@ export const profile = {
     scholar: 'TODO: Google Scholar URL (delete this line if you have none)',
     cv: '/cv.pdf',
   },
-  photoNote: 'TODO: replace src/assets/profile.jpg with a professional head-and-shoulders photo',
+  photoNote: '',
   tagline:
     'I work on power converter control: geometric boundary control laws, and the embedded and FPGA hardware that runs and tests them in real time.',
 };
