@@ -1,0 +1,81 @@
+---
+// Sinusoidal PWM: a reference sine compared against a triangular carrier.
+// Drawn twice the visible width so it can loop seamlessly.
+const W = 1200;        // visible width (viewBox)
+const H = 220;
+const P = 600;         // sine period in px → 2 periods visible
+const CARRIERS = 18;   // carrier cycles per sine period
+const M = 0.82;        // modulation index
+const mid = H / 2;
+const amp = 78;
+
+const total = W * 2;
+const sinePts: string[] = [];
+for (let x = 0; x <= total; x += 4) {
+  const y = mid - amp * M * Math.sin((2 * Math.PI * x) / P);
+  sinePts.push(`${x === 0 ? 'M' : 'L'}${x} ${y.toFixed(2)}`);
+}
+const sine = sinePts.join(' ');
+
+const C = P / CARRIERS;
+const tri = (x: number) => {
+  const t = (((x % C) + C) % C) / C; // 0..1
+  return t < 0.5 ? -1 + 4 * t : 3 - 4 * t; // -1..1..-1
+};
+let state = M * Math.sin(0) > tri(0) ? 1 : -1;
+let pwm = `M0 ${mid - state * amp}`;
+for (let x = 0.25; x <= total; x += 0.25) {
+  const s = M * Math.sin((2 * Math.PI * x) / P) > tri(x) ? 1 : -1;
+  if (s !== state) {
+    pwm += ` H${x.toFixed(2)} V${mid - s * amp}`;
+    state = s;
+  }
+}
+pwm += ` H${total}`;
+---
+<div class="wave" aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice">
+    <line x1="0" x2={W} y1={mid} y2={mid} class="axis" />
+    <g class="track">
+      <path d={pwm} class="pwm" pathLength="1" />
+      <path d={sine} class="sine" pathLength="1" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .wave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 72px;
+    height: var(--wave-h);
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  .axis { stroke: var(--line); stroke-width: 1; }
+  .track { animation: slide 26s linear infinite; }
+  path { fill: none; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .pwm {
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.38;
+    animation: draw 3.2s 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+  .sine {
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    opacity: 0.55;
+    animation: draw 2.6s 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes slide { to { transform: translateX(-1200px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    path { stroke-dashoffset: 0; }
+    .track { animation: none; }
+  }
+</style>

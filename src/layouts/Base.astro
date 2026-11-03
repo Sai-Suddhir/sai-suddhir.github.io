@@ -1,0 +1,238 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { profile } from '../data/content';
+
+interface Props { title?: string; description?: string }
+const {
+  title = `${profile.name}: Power Electronics & Control`,
+  description = `${profile.name}, dual-degree student at ${profile.institution}. ${profile.tagline}`,
+} = Astro.props;
+
+const nav = [
+  { href: '#about', label: 'About' },
+  { href: '#research', label: 'Research' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#honors', label: 'Honors' },
+  { href: '#contact', label: 'Contact' },
+];
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1114" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap"
+    />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="progress" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="container bar">
+        <a href="#top" class="brand" aria-label="Back to top">
+          <span class="brand-mark">S</span>
+          <span class="brand-name">{profile.name}</span>
+        </a>
+        <nav class="nav-links" aria-label="Sections">
+          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+        </nav>
+        <div class="bar-actions">
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <span class="i-sun"><Icon name="sun" size={17} /></span>
+            <span class="i-moon"><Icon name="moon" size={17} /></span>
+          </button>
+          <a class="cv-btn" href={profile.links.cv} target="_blank" rel="noopener">CV</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container foot">
+        <span>© {new Date().getFullYear()} {profile.name}</span>
+        <span class="foot-links">
+          <a class="link" href={`mailto:${profile.email}`}>Email</a>
+          <a class="link" href={profile.links.github} target="_blank" rel="noopener">GitHub</a>
+          <a class="link" href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      import '../scripts/motion';
+
+      const btn = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      btn?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const isDark =
+          root.dataset.theme === 'dark' ||
+          (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+        const next = isDark ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 8px 14px;
+    border-radius: 8px;
+  }
+  .skip:focus { left: 8px; }
+
+  .progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    z-index: 60;
+  }
+
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    transition: transform 0.6s var(--ease), background-color 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  .site-header:global(.is-scrolled) {
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom-color: var(--line);
+  }
+  .site-header:global(.is-hidden) { transform: translateY(-100%); }
+
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--serif);
+    font-size: 18px;
+    transition: background-color 0.4s, transform 0.6s var(--ease);
+  }
+  .brand:hover .brand-mark { background: var(--accent); transform: rotate(-8deg); }
+  .brand-name { font-size: 15px; letter-spacing: -0.01em; }
+
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a {
+    position: relative;
+    font-size: 14px;
+    color: var(--muted);
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 2px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease);
+  }
+  .nav-links a:hover, .nav-links a:global(.is-active) { color: var(--ink); }
+  .nav-links a:hover::after, .nav-links a:global(.is-active)::after { transform: scaleX(1); }
+
+  .bar-actions { display: flex; align-items: center; gap: 8px; }
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .theme-toggle:hover { border-color: var(--line-strong); color: var(--accent); }
+  .theme-toggle span { display: grid; place-items: center; }
+  .i-moon { display: none !important; }
+  :global(:root[data-theme='dark']) .i-sun { display: none !important; }
+  :global(:root[data-theme='dark']) .i-moon { display: grid !important; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .i-sun { display: none !important; }
+    :global(:root:not([data-theme='light'])) .i-moon { display: grid !important; }
+  }
+
+  .cv-btn {
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--bg);
+    transition: background-color 0.3s, transform 0.4s var(--ease);
+  }
+  .cv-btn:hover { background: var(--accent); color: #fff; }
+
+  .site-footer { margin-top: 96px; border-top: 1px solid var(--line); }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 28px;
+    padding-bottom: 36px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .foot-links { display: flex; gap: 18px; }
+
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+  }
+  @media (max-width: 380px) {
+    .brand-name { display: none; }
+  }
+</style>
