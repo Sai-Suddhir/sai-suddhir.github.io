@@ -5,7 +5,7 @@ order: 5
 oneLiner: SPWM, harmonic injection and active PFC on the F28379D.
 role: "Course project · Digital Controller for Power Applications (EE5212)"
 period: "Jan – May '26"
-tags: [TI C2000, F28379D, Embedded C, PFC]
+tags: [TI F28379D, Embedded C, PFC, lag compensator, controller]
 ---
 
 ## Overview
