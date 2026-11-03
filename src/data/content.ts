@@ -23,6 +23,14 @@ export const profile = {
     cv: '/cv.pdf',
   },
   photoNote: 'TODO: replace src/assets/profile.jpg with a professional head-and-shoulders photo',
+  status: 'Applying for MS programs in Electrical Engineering',
+  location: 'Chennai, India',
+  // Short "what I'm doing now" list shown in the hero card
+  now: [
+    { label: 'Thesis', text: 'Boundary control & sensor reduction for inverters' },
+    { label: 'Paper', text: 'Under review at ICPE 2027' },
+    { label: 'Lab', text: 'My HIL platform now trains juniors in the power lab' },
+  ],
 };
 
 export const about = {
