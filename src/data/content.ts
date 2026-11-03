@@ -53,7 +53,7 @@ export const about = {
       school: 'Indian Institute of Technology Madras',
       degree: 'B.Tech Aerospace Engineering + M.Tech Electric Vehicles (Dual Degree)',
       period: '2022 – 2027',
-      detail: 'CGPA 8.55 / 10',
+      detail: 'CGPA 8.56/ 10',
     },
     {
       school: 'Mahindra World School, Chennai',
