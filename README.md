@@ -2,19 +2,58 @@
 
 Personal academic website of Sai Suddhir A B, built with [Astro](https://astro.build).
 
-## Editing content
-Almost everything you'd want to change lives in **`src/data/content.ts`** (bio, research, projects, honors, skills).
-- Photos and project images: `src/assets/` (reference the file name in `content.ts`)
-- CV: replace `public/cv.pdf`
-- Colours and fonts: the tokens at the top of `src/styles/global.css`
+## Where things live
+
+| What | Where |
+| --- | --- |
+| Bio, education, honors, coursework, contact text | `src/data/content.ts` |
+| One folder per project / research item | `src/content/work/<id>/index.md` |
+| Project images (cover, gallery) | next to that `index.md` |
+| Project PDFs (slides, reports, schematics) | `public/work/<id>/` |
+| Profile photo | `src/assets/profile.jpg` |
+| CV | `public/cv.pdf` |
+| Colours and fonts | top of `src/styles/global.css` |
+
+Any value starting with `TODO` shows as a yellow tag on the local preview only and never on the live site.
+
+## Adding supporting files to a project
+
+Example: adding PCB photos, slides and code to the Hyperloop project.
+
+1. Copy images into `src/content/work/hyperloop/` (e.g. `board-photo.jpg`).
+2. Copy PDFs into `public/work/hyperloop/` (e.g. `ehw-slides.pdf`).
+3. List them in `src/content/work/hyperloop/index.md`:
+
+```yaml
+cover: ./pcu-render.png          # big image under the title
+gallery:
+  - { src: ./board-photo.jpg, caption: "Assembled PCU board" }
+documents:
+  - { title: "EHW 2024 presentation", file: ehw-slides.pdf, kind: slides }
+  # kind: slides | report | schematic | paper | poster | other
+code:
+  - { title: "Pod CAN driver", url: "https://github.com/Sai-Suddhir/...", description: "Unified CAN.c driver" }
+links:
+  - { label: "Team website", url: "https://..." }
+video: dQw4w9WgXcQ               # a YouTube video id, or a file in public/work/<id>/
+highlights:
+  - { value: "1st", label: "in Asia at EHW 2024" }
+```
+
+The write-up below the `---` is plain Markdown (`## Headings`, `- bullets`, `**bold**`).
+
+## Adding a new project
+
+Copy any folder in `src/content/work/`, rename it (the folder name becomes the URL, `/work/<folder>/`), and edit `index.md`. Set `group` to `research`, `projects` or `industry`, and `order` to its position in that list.
 
 ## Commands
+
 | Command | Action |
 | --- | --- |
 | `npm install` | Install dependencies |
-| `npm run dev` | Local dev server at http://localhost:4321 |
+| `npm run dev` | Local preview at http://localhost:4321 |
 | `npm run build` | Build the site into `dist/` |
-| `npm run preview` | Preview the built site |
 
 ## Deploying
-Pushing to `main` builds and deploys automatically to GitHub Pages via `.github/workflows/deploy.yml`.
+
+Pushing to `main` builds and deploys to GitHub Pages via `.github/workflows/deploy.yml`.
