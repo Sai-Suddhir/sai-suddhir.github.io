@@ -21,11 +21,39 @@ document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
     const target = id === '#top' ? document.body : document.querySelector<HTMLElement>(id);
     if (!target) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(target, { offset: id === '#top' ? 0 : -64 });
+    if (target instanceof HTMLDetailsElement && !target.open) setOpen(target, true);
+    if (lenis) lenis.scrollTo(target, { offset: id === '#top' ? 0 : -88 });
     else target.scrollIntoView();
     history.replaceState(null, '', id);
   });
 });
+
+/* ── Expandable rows: animate open / close ── */
+function setOpen(d: HTMLDetailsElement, open: boolean) {
+  const body = d.querySelector<HTMLElement>('.row-body');
+  if (!body || reduce) { d.open = open; return; }
+  const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  if (open) {
+    d.open = true;
+    const h = body.scrollHeight;
+    body.animate([{ height: '0px', opacity: 0 }, { height: `${h}px`, opacity: 1 }], { duration: 520, easing: ease });
+  } else {
+    const h = body.offsetHeight;
+    const anim = body.animate([{ height: `${h}px`, opacity: 1 }, { height: '0px', opacity: 0 }], { duration: 380, easing: ease });
+    anim.onfinish = () => { d.open = false; };
+  }
+}
+document.querySelectorAll<HTMLDetailsElement>('details.row').forEach((d) => {
+  d.querySelector('summary')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    setOpen(d, !d.open);
+  });
+});
+// Opening the page at e.g. /#work-hil expands that row
+if (location.hash) {
+  const t = document.querySelector(location.hash);
+  if (t instanceof HTMLDetailsElement) t.open = true;
+}
 
 /* ── Reveal on scroll (with stagger for groups) ── */
 document.querySelectorAll<HTMLElement>('[data-stagger]').forEach((group) => {
