@@ -16,6 +16,8 @@ Personal academic website of Sai Suddhir A B, built with [Astro](https://astro.b
 
 Any value starting with `TODO` shows as a yellow tag on the local preview only and never on the live site.
 
+The small "still being built" note at the bottom of every page is `site.wip` in `src/data/content.ts`; set it to `''` to remove it.
+
 ## Adding supporting files to a project
 
 Example: adding PCB photos, slides and code to the Hyperloop project.
@@ -36,15 +38,19 @@ code:
 links:
   - { label: "Team website", url: "https://..." }
 video: dQw4w9WgXcQ               # a YouTube video id, or a file in public/work/<id>/
-highlights:
-  - { value: "1st", label: "in Asia at EHW 2024" }
+highlights:                      # keep these big-picture: words, not decimals
+  - { value: "1st in Asia", label: "European Hyperloop Week 2024" }
+wanted:                          # photos still to collect: empty frames on the local preview only
+  - "Team photo in Zurich"
 ```
+
+When a photo arrives, add it to `gallery` and delete its line from `wanted`.
 
 The write-up below the `---` is plain Markdown (`## Headings`, `- bullets`, `**bold**`).
 
 ## Adding a new project
 
-Copy any folder in `src/content/work/`, rename it (the folder name becomes the URL, `/work/<folder>/`), and edit `index.md`. Set `group` to `research`, `projects` or `industry`, and `order` to its position in that list.
+Copy any folder in `src/content/work/`, rename it (the folder name becomes the URL, `/work/<folder>/`), and edit `index.md`. Set `group` to `research`, `projects`, `industry` or `course` (course projects, shown as a compact list), and `order` to its position in that list. Keep `title` and `oneLiner` big-picture; the details belong in the write-up below the `---`.
 
 ## Commands
 

@@ -1,8 +1,8 @@
 ---
-title: Low-Cost FPGA Hardware-in-the-Loop Simulator
+title: "Affordable Real-Time Simulation for Power Electronics"
 group: research
 order: 2
-oneLiner: A real-time simulator for testing converter controllers, built for about ₹30k instead of ₹8–21 lakh. Now used in a lab course.
+oneLiner: "A hardware-in-the-loop simulator for testing converter controllers safely, at a fraction of the usual cost. Now used to teach a lab course."
 role: Undergraduate Research Project (UGRC)
 period: "Dec '25 – May '26"
 advisor: Prof. Lakshminarasamma N
@@ -10,10 +10,10 @@ status: In use in a lab course
 cover: ./interface-card.png
 coverAlt: 3D render of the Controller Interface Card v2.0, with DIN41612 connectors, BNC ports and a TI F28379D LaunchPad
 tags: [Verilog, Altera MAX V, TI F28379D, CHIL, Typhoon HIL, PLECS, ModelSim, Altium]
-highlights:
-  - { value: "~₹30k", label: "to build, vs ₹8–21 lakh for commercial real-time simulators" }
-  - { value: "10 MHz", label: "FPGA plant solver, updating iL and vC in the same clock cycle" }
-  - { value: "216 Hz", label: "plant resonance predicted analytically and reproduced on hardware" }
+highlights: 
+  - { value: "Low cost", label: "a fraction of the price of commercial real-time simulators" }
+  - { value: "Real time", label: "a switching-level converter model running on an FPGA" }
+  - { value: "In use", label: "training students in a power electronics lab course" }
 gallery:
   - { src: ./plant-pcb.png, caption: "Plant PCB v1.0: a carrier for the F28379D that stands in for the simulator" }
   - { src: ./fpga-flow.png, caption: "Verilog architecture of the switching boost-converter model" }
@@ -24,6 +24,9 @@ gallery:
 documents:
   - { title: "Low-Cost Real-Time Simulator: project report", file: ugrc-report.pdf, kind: report, note: "8 pages" }
   - { title: "Design and Implementation of a Low-Cost Real-Time Simulator", file: ugrc-slides.pdf, kind: slides, note: "UGRC presentation · 21 slides · June 2026" }
+wanted: 
+  - "The full setup on the bench: controller, interface card, oscilloscope"
+  - "Assembled Controller Interface Card"
 ---
 
 ## Why build one

@@ -1,14 +1,11 @@
 ---
-title: 1 kW Half-Bridge Series Resonant Converter
-group: projects
-order: 4
-oneLiner: 400 V → 48 V telecom DC-DC converter designed in PLECS.
-role: "Course project · Switched Mode Power Conversion (EE5200)"
+title: "Resonant DC-DC Conversion for Telecom Power"
+group: course
+order: 2
+oneLiner: "A soft-switching converter that steps a high-voltage bus down for telecom equipment, with very little lost as heat."
+role: "Switched Mode Power Conversion (EE5200)"
 period: "Jan – May '26"
 tags: [PLECS, Resonant converters, FHA, Magnetics]
-highlights:
-  - { value: "1 kW", label: "output power" }
-  - { value: "100 kHz", label: "switching frequency" }
 ---
 
 ## Overview

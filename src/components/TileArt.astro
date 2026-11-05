@@ -1,7 +1,7 @@
 ---
 // Generated blueprint-style artwork for work items that have no cover image.
 // The pattern is derived from the item id, so each card looks different but stable.
-interface Props { id: string; title: string; group: 'research' | 'projects' | 'industry' }
+interface Props { id: string; title: string; group: 'research' | 'projects' | 'industry' | 'course' }
 const { id, title, group } = Astro.props;
 
 // tiny deterministic PRNG from the id
@@ -48,6 +48,22 @@ if (group === 'research') {
     pads.push({ x, y });
     (t < 2 ? (motif += d) : (motif2 += d));
   }
+} else if (group === 'course') {
+  // second-order step responses with different damping
+  const t0 = 30, x1 = W - 20, y0 = H - 50, y1 = 70;
+  const step = (zeta: number) => {
+    const wn = 0.045 + rand() * 0.02;
+    const wd = wn * Math.sqrt(1 - zeta * zeta);
+    let d = `M0 ${y0}L${t0} ${y0}`;
+    for (let x = t0; x <= x1; x += 3) {
+      const t = x - t0;
+      const v = 1 - Math.exp(-zeta * wn * t) * (Math.cos(wd * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(wd * t));
+      d += `L${x} ${(y0 - (y0 - y1) * v).toFixed(1)}`;
+    }
+    return d;
+  };
+  motif = step(0.25 + rand() * 0.1);
+  motif2 = step(0.7) + `M${t0} ${y1}H${x1}`;
 } else {
   // concentric hexagon
   const cx = W * (0.55 + rand() * 0.2), cy = H / 2;

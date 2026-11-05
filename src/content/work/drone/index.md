@@ -1,19 +1,19 @@
 ---
-title: Custom Flight Controller for a Drone Swarm
+title: "Affordable Flight Control for Drone Swarms"
 group: projects
 order: 3
-oneLiner: An STM32 flight controller at 70% lower cost than a Pixhawk.
+oneLiner: "A flight controller designed from scratch, so that building a swarm of drones doesn't cost a fortune."
 org: Aero Club, IIT Madras
 role: Embedded Systems Engineer
 period: "Sep '23 – Nov '24"
 cover: ./fc-layout.png
 coverAlt: PCB layout of the custom STM32 drone flight controller
 tags: [STM32, PCB design, EMI filtering, Python]
-highlights:
-  - { value: "70%", label: "lower hardware cost than a Pixhawk" }
-  - { value: "85%", label: "success rate of the anti-collision model" }
 documents:
   - { title: "Flight controller schematic", file: fc-schematic.pdf, kind: schematic }
+wanted: 
+  - "Assembled flight controller"
+  - "A drone flying on it"
 ---
 
 ## Problem

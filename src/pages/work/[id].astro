@@ -31,7 +31,7 @@ const gallery = await Promise.all(
 const coverFull = d.cover ? (await getImage({ src: d.cover, width: 2000 })).src : undefined;
 
 const facts = [
-  { k: 'Role', v: d.role },
+  { k: d.group === 'course' ? 'Course' : 'Role', v: d.role },
   { k: 'Organisation', v: d.org },
   { k: 'Period', v: d.period },
   { k: 'Advisor', v: d.advisor },
@@ -44,7 +44,7 @@ const kindLabel: Record<string, string> = {
 
 const sections = [
   { id: 'overview', label: 'Overview', show: true },
-  { id: 'gallery', label: 'Gallery', show: gallery.length > 0 },
+  { id: 'gallery', label: 'Gallery', show: gallery.length > 0 || (import.meta.env.DEV && d.wanted.length > 0) },
   { id: 'documents', label: 'Documents', show: d.documents.length > 0 },
   { id: 'video', label: 'Video', show: !!d.video },
   { id: 'code', label: 'Code & links', show: d.code.length + d.links.length > 0 },
@@ -52,7 +52,7 @@ const sections = [
 
 const missing = [
   !d.cover && 'a cover image',
-  !gallery.length && 'gallery images (PCB renders, photos, plots)',
+  !gallery.length && !d.wanted.length && 'gallery images (PCB renders, photos, plots)',
   !d.documents.length && 'documents (slides, report, schematic)',
   !d.code.length && 'code repositories',
 ].filter(Boolean) as string[];
@@ -81,7 +81,7 @@ const missing = [
 
     {d.cover && (
       <figure class="cover container proj-fade" style="--h:5">
-        <button class="zoom" type="button" data-full={coverFull} data-caption={d.coverAlt ?? d.title} aria-label="View full size">
+        <button class="zoom cover-zoom" type="button" data-full={coverFull} data-caption={d.coverAlt ?? d.title} aria-label="View full size">
           <Image src={d.cover} alt={d.coverAlt ?? d.title} widths={[640, 1000, 1400]} sizes="(max-width: 1100px) 100vw, 1080px" loading="eager" />
         </button>
       </figure>
@@ -89,7 +89,7 @@ const missing = [
 
     {d.highlights.length > 0 && (
       <div class="container">
-        <ul class="hl" data-stagger="100">
+        <ul class="hl rule-in" data-reveal data-stagger="100">
           {d.highlights.map((h) => (
             <li data-reveal><span class="hl-v">{h.value}</span><span class="hl-l">{h.label}</span></li>
           ))}
@@ -104,16 +104,24 @@ const missing = [
           <Content />
         </section>
 
-        {gallery.length > 0 && (
+        {(gallery.length > 0 || (import.meta.env.DEV && d.wanted.length > 0)) && (
           <section id="gallery" class="block">
-            <h2 class="block-title" data-reveal>Gallery</h2>
+            <h2 class="block-title" data-split>Gallery</h2>
             <div class="gallery" data-stagger="80">
               {gallery.map((g) => (
                 <figure class:list={[{ wide: g.wide }]} data-reveal>
-                  <button class="zoom" type="button" data-full={g.full} data-caption={g.caption ?? ''} aria-label={`View ${g.caption ?? 'image'} full size`}>
+                  <button class="zoom" data-curtain type="button" data-full={g.full} data-caption={g.caption ?? ''} aria-label={`View ${g.caption ?? 'image'} full size`}>
                     <Image src={g.src} alt={g.caption ?? ''} widths={g.wide ? [700, 1100, 1600] : [400, 700, 1000]} sizes={g.wide ? '(max-width: 860px) 100vw, 760px' : '(max-width: 860px) 100vw, 380px'} />
                   </button>
                   {g.caption && <figcaption>{g.caption}</figcaption>}
+                </figure>
+              ))}
+              {import.meta.env.DEV && d.wanted.map((w) => (
+                <figure class="wanted" data-reveal>
+                  <span class="wanted-frame">
+                    <span class="wanted-tag">Photo to add</span>
+                  </span>
+                  <figcaption>{w}</figcaption>
                 </figure>
               ))}
             </div>
@@ -122,12 +130,12 @@ const missing = [
 
         {d.documents.length > 0 && (
           <section id="documents" class="block">
-            <h2 class="block-title" data-reveal>Documents</h2>
+            <h2 class="block-title" data-split>Documents</h2>
             <div class="docs" data-stagger="80">
               {d.documents.map((doc, i) => {
                 const url = fileUrl(entry.id, doc.file);
                 return (
-                  <div class="doc card" data-reveal>
+                  <div class="doc card" data-reveal data-glow>
                     <div class="doc-row">
                       <span class="doc-icon" aria-hidden="true">PDF</span>
                       <div class="doc-text">
@@ -150,7 +158,7 @@ const missing = [
 
         {d.video && (
           <section id="video" class="block">
-            <h2 class="block-title" data-reveal>Video</h2>
+            <h2 class="block-title" data-split>Video</h2>
             <div class="video" data-reveal>
               {isYouTube(d.video)
                 ? <iframe src={`https://www.youtube-nocookie.com/embed/${d.video}`} title={`${d.title} video`} loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
@@ -161,10 +169,10 @@ const missing = [
 
         {(d.code.length > 0 || d.links.length > 0) && (
           <section id="code" class="block">
-            <h2 class="block-title" data-reveal>Code &amp; links</h2>
+            <h2 class="block-title" data-split>Code &amp; links</h2>
             <div class="repos" data-stagger="80">
               {d.code.map((c) => (
-                <a class="repo card" href={c.url} target="_blank" rel="noopener" data-reveal>
+                <a class="repo card" href={c.url} target="_blank" rel="noopener" data-reveal data-glow>
                   <Icon name="github" size={20} />
                   <span class="repo-text">
                     <span class="repo-title">{c.title}</span>
@@ -174,7 +182,7 @@ const missing = [
                 </a>
               ))}
               {d.links.map((l) => (
-                <a class="repo card" href={l.url} target="_blank" rel="noopener" data-reveal>
+                <a class="repo card" href={l.url} target="_blank" rel="noopener" data-reveal data-glow>
                   <Icon name="arrow" size={20} />
                   <span class="repo-text"><span class="repo-title">{l.label}</span></span>
                   <Icon name="arrow" size={16} />
@@ -218,13 +226,13 @@ const missing = [
     <!-- ───── Prev / next ───── -->
     <nav class="container pager" aria-label="More work">
       {prev ? (
-        <a class="pager-link card" href={`/work/${prev.id}/`}>
+        <a class="pager-link card" href={`/work/${prev.id}/`} data-glow>
           <span class="pager-dir">← Previous</span>
           <span class="pager-title">{prev.data.title}</span>
         </a>
       ) : <span></span>}
       {next ? (
-        <a class="pager-link card next" href={`/work/${next.id}/`}>
+        <a class="pager-link card next" href={`/work/${next.id}/`} data-glow>
           <span class="pager-dir">Next →</span>
           <span class="pager-title">{next.data.title}</span>
         </a>
@@ -335,6 +343,11 @@ const missing = [
     max-height: 560px;
   }
   .cover :global(img) { width: 100%; max-height: 560px; object-fit: contain; }
+  .cover-zoom { clip-path: inset(100% 0 0 0 round 18px); animation: curtain 1.4s var(--ease) 0.45s forwards; }
+  .cover-zoom :global(img) { transform: scale(1.1); animation: settle 2s var(--ease) 0.45s forwards; }
+  .cover-zoom:hover :global(img) { scale: 1.02; }
+  @keyframes curtain { to { clip-path: inset(-80px round 18px); } }
+  @keyframes settle { to { transform: none; } }
 
   .zoom { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; }
   .zoom :global(img) { transition: transform 1s var(--ease); }
@@ -345,10 +358,11 @@ const missing = [
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     margin-top: 40px;
-    border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
   }
-  .hl li { padding: 24px 20px 22px 0; }
+  .hl li { padding: 24px 24px 22px 0; }
+  .hl li + li { padding-left: 24px; border-left: 1px solid var(--line); }
+  @media (max-width: 700px) { .hl li + li { padding-left: 0; border-left: 0; } }
   .hl-v { display: block; font-family: var(--serif); font-size: clamp(30px, 3.6vw, 42px); line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px; }
   .hl-l { display: block; color: var(--muted); font-size: 13.5px; max-width: 240px; }
 
@@ -365,6 +379,8 @@ const missing = [
     transition: color 0.3s, border-color 0.3s;
   }
   .toc a:hover, .quick a:hover { color: var(--accent); border-color: var(--accent); }
+  .toc a { transition: color 0.3s, border-color 0.4s, padding-left 0.5s var(--ease); }
+  .toc a:global(.is-active) { color: var(--ink); border-color: var(--accent); padding-left: 16px; }
   .q-kind { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
   .block { margin-top: 64px; scroll-margin-top: 88px; }
@@ -375,8 +391,26 @@ const missing = [
   .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; align-items: start; }
   .gallery figure.wide { grid-column: 1 / -1; }
   .gallery figure { margin: 0; }
-  .gallery .zoom { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+  .gallery .zoom { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #fff; --curtain-r: 12px; }
+
+  /* photo placeholders (local preview only) */
+  .wanted { margin: 0; }
+  .wanted-frame {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    border: 1px dashed color-mix(in srgb, #c99a00 70%, transparent);
+    background:
+      repeating-linear-gradient(135deg, transparent 0 10px, rgba(201, 154, 0, 0.06) 10px 11px),
+      rgba(255, 200, 0, 0.04);
+  }
+  .wanted-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #a07a00; }
+  .wanted figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
   .gallery :global(img) { width: 100%; height: auto; display: block; }
+  /* regular images share one frame so the grid stays even; wide plots keep their shape */
+  .gallery figure:not(.wide) .zoom { aspect-ratio: 4 / 3; }
+  .gallery figure:not(.wide) .zoom :global(img) { height: 100%; object-fit: contain; }
   .gallery figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
 
   /* documents */
@@ -512,5 +546,7 @@ const missing = [
   }
   @media (prefers-reduced-motion: reduce) {
     .proj-fade { opacity: 1; transform: none; animation: none; }
+    .cover-zoom { clip-path: none; animation: none; }
+    .cover-zoom :global(img) { transform: none; animation: none; }
   }
 </style>

@@ -9,7 +9,7 @@ import profilePhoto from '../assets/profile.jpg';
 import {
   isTodo, profile, intro, about, publications, teaching, coursework, tools, contact,
 } from '../data/content';
-import { getWork, GROUPS, resourceSummary } from '../lib/work';
+import { getWork, GROUPS } from '../lib/work';
 
 const work = await getWork();
 const workGroups = GROUPS.map((g) => ({ key: g.key, label: g.label, items: work.filter((w) => w.data.group === g.key) })).filter((g) => g.items.length);
@@ -50,9 +50,11 @@ const md = (s: string) =>
     </div>
 
     <div class="container intro-body" id="about">
-      <figure class="me fade" style="--h:1">
+      <figure class="me">
         <span class="me-frame">
-          <Image src={profilePhoto} alt={`Photo of ${profile.name}`} widths={[360, 560, 760]} sizes="(max-width: 760px) 80vw, 340px" loading="eager" />
+          <span class="me-drift" data-parallax="14">
+            <Image src={profilePhoto} alt={`Photo of ${profile.name}`} widths={[360, 560, 760]} sizes="(max-width: 760px) 80vw, 340px" loading="eager" />
+          </span>
         </span>
       </figure>
       <div class="intro-text">
@@ -79,14 +81,14 @@ const md = (s: string) =>
     <div class="container">
       <div class="section-head" data-reveal>
         <span class="eyebrow">Background</span>
-        <h2 class="section-title">A little more about me</h2>
+        <h2 class="section-title" data-split>A little more about me</h2>
       </div>
       <div class="bg-grid">
         <div>
           <h3 class="mini-head" data-reveal>Education</h3>
           <ul class="edu" data-stagger="90">
             {about.education.map((e) => (
-              <li data-reveal>
+              <li class="rule-in" data-reveal>
                 <div>
                   <p class="edu-school">{e.school}</p>
                   <p class="edu-degree">{e.degree}</p>
@@ -136,13 +138,13 @@ const md = (s: string) =>
     <div class="container">
       <div class="section-head" data-reveal>
         <span class="eyebrow">Work</span>
-        <h2 class="section-title">Research &amp; projects</h2>
+        <h2 class="section-title" data-split>Research &amp; projects</h2>
         <p class="section-sub">Pick any card to open its full page, with images, documents and code.</p>
       </div>
 
       <h3 class="mini-head" data-reveal>Publication</h3>
       {publications.map((p) => (
-        <article class="pub card" data-reveal>
+        <article class="pub card" data-reveal data-glow>
           <h4 class="pub-title">{p.title}</h4>
           <p class="pub-authors" set:html={p.authors} />
           <p class="pub-venue">{p.venue}</p>
@@ -158,33 +160,44 @@ const md = (s: string) =>
       {workGroups.map((g) => (
         <>
           <h3 class="mini-head" data-reveal>{g.label}</h3>
-          <div class={`tiles tiles-${g.key}`} style={`--cols:${Math.max(1, Math.min(3, g.items.filter((w) => w.id !== featuredId).length))}`} data-stagger="80">
-            {g.items.map((w) => {
-              const d = w.data;
-              const meta = [d.role, d.period].filter((m) => m && !isTodo(m)).join(' · ');
-              const res = resourceSummary(w);
-              const featured = w.id === featuredId;
-              const thumb = d.cover ?? d.gallery[0]?.src; // fall back to the first gallery image
-              return (
-                <a class:list={['tile', { 'tile-featured': featured }]} href={`/work/${w.id}/`} data-reveal>
-                  <span class="tile-media">
-                    {thumb
-                      ? <Image src={thumb} alt="" widths={featured ? [600, 900, 1200] : [400, 640]} sizes={featured ? '(max-width: 900px) 100vw, 640px' : '(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px'} />
-                      : <TileArt id={w.id} title={d.title} group={d.group} />}
-                  </span>
-                  <span class="tile-body">
-                    {meta && <span class="tile-meta">{meta}</span>}
-                    <span class="tile-title" style={`view-transition-name: work-${w.id}`}>{d.title}</span>
-                    <span class="tile-one">{d.oneLiner}</span>
-                    <span class="tile-foot">
-                      <span class="tile-res">{res.join(' · ')}</span>
-                      <span class="tile-open">Open <Icon name="arrow" size={14} /></span>
+          {g.key === 'course' ? (
+            <ul class="rows" data-stagger="70">
+              {g.items.map((w) => (
+                <li data-reveal class="rule-in">
+                  <a class="row" href={`/work/${w.id}/`} data-glow>
+                    <span class="row-title" style={`view-transition-name: work-${w.id}`}>{w.data.title}</span>
+                    <span class="row-one">{w.data.oneLiner}</span>
+                    <span class="row-meta">{w.data.role}</span>
+                    <span class="row-arrow" aria-hidden="true"><Icon name="arrow" size={16} /></span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div class={`tiles tiles-${g.key}`} style={`--cols:${Math.max(1, Math.min(3, g.items.filter((w) => w.id !== featuredId).length))}`} data-stagger="90">
+              {g.items.map((w) => {
+                const d = w.data;
+                const meta = [d.role, d.period].filter((m) => m && !isTodo(m)).join(' · ');
+                const featured = w.id === featuredId;
+                const thumb = d.cover ?? d.gallery[0]?.src; // fall back to the first gallery image
+                return (
+                  <a class:list={['tile', { 'tile-featured': featured }]} href={`/work/${w.id}/`} data-reveal data-glow>
+                    <span class="tile-media" data-curtain>
+                      {thumb
+                        ? <Image src={thumb} alt="" widths={featured ? [600, 900, 1200] : [400, 640]} sizes={featured ? '(max-width: 900px) 100vw, 640px' : '(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px'} />
+                        : <TileArt id={w.id} title={d.title} group={d.group} />}
                     </span>
-                  </span>
-                </a>
-              );
-            })}
-          </div>
+                    <span class="tile-body">
+                      {meta && <span class="tile-meta">{meta}</span>}
+                      <span class="tile-title" style={`view-transition-name: work-${w.id}`}>{d.title}</span>
+                      <span class="tile-one">{d.oneLiner}</span>
+                      <span class="tile-open">Read more <Icon name="arrow" size={14} /></span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          )}
         </>
       ))}
     </div>
@@ -195,14 +208,14 @@ const md = (s: string) =>
     <div class="container">
       <div class="section-head" data-reveal>
         <span class="eyebrow">Academics</span>
-        <h2 class="section-title">Coursework &amp; teaching</h2>
+        <h2 class="section-title" data-split>Coursework &amp; teaching</h2>
       </div>
       <div class="kit">
         <div>
           <h3 class="mini-head" data-reveal>Key coursework</h3>
           <dl class="kit-list" data-stagger="70">
             {coursework.map((s) => (
-              <div data-reveal>
+              <div class="rule-in" data-reveal>
                 <dt>{s.group}</dt>
                 <dd>
                   <ul class="courses">
@@ -226,7 +239,7 @@ const md = (s: string) =>
           <h3 class="mini-head" data-reveal>Tools</h3>
           <dl class="kit-list" data-stagger="70">
             {tools.map((s) => (
-              <div data-reveal>
+              <div class="rule-in" data-reveal>
                 <dt>{s.group}</dt>
                 <dd>{s.items}</dd>
               </div>
@@ -240,7 +253,7 @@ const md = (s: string) =>
   <!-- ───────── CV ───────── -->
   <section class="section" id="cv">
     <div class="container">
-      <div class="cv-band card" data-reveal>
+      <div class="cv-band card" data-reveal data-glow>
         <div>
           <span class="eyebrow">CV</span>
           <h2 class="cv-title">Curriculum Vitae</h2>
@@ -257,7 +270,7 @@ const md = (s: string) =>
   <!-- ───────── Contact ───────── -->
   <section class="section contact" id="contact">
     <div class="container">
-      <div class="contact-card" data-reveal>
+      <div class="contact-card" data-reveal data-glow>
         <span class="eyebrow">Contact</span>
         <h2 class="contact-title">Let's talk.</h2>
         <p class="contact-text">{contact}</p>
@@ -349,8 +362,21 @@ const md = (s: string) =>
     border: 1px solid var(--line);
     box-shadow: var(--shadow-hover);
   }
-  .me-frame :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 1.4s var(--ease); }
-  .me:hover .me-frame :global(img) { transform: scale(1.03); }
+  .me-frame {
+    clip-path: inset(100% 0 0 0 round 22px);
+    animation: curtain 1.5s var(--ease) 1.25s forwards;
+  }
+  @keyframes curtain { to { clip-path: inset(-80px round 22px); } } /* overshoot so the shadow isn't clipped */
+  .me-drift { display: block; width: 100%; height: 100%; transform: scale(1.08); will-change: transform; }
+  .me-frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    transform: scale(1.14);
+    animation: settle 2.2s var(--ease) 1.25s forwards;
+  }
+  @keyframes settle { to { transform: none; } }
 
   .intro-text p { font-size: clamp(17px, 1.6vw, 19px); line-height: 1.8; color: var(--ink-2); margin: 0 0 1.1em; }
   .intro-text p :global(strong) { color: var(--ink); font-weight: 600; }
@@ -463,15 +489,24 @@ const md = (s: string) =>
   .tile-media { display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg); border-bottom: 1px solid var(--line); }
   .tile-media :global(img), .tile-media :global(svg) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
   .tile:hover .tile-media :global(img), .tile:hover .tile-media :global(svg) { transform: scale(1.05); }
-  .tile-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 18px; flex: 1; }
+  .tile-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; flex: 1; }
   .tile-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
   .tile-title { font-family: var(--serif); font-size: 23px; line-height: 1.15; color: var(--ink); width: fit-content; transition: color 0.3s; }
   .tile:hover .tile-title { color: var(--accent); }
   .tile-one { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; flex: 1; }
-  .tile-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .tile-res { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
-  .tile-open { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); transition: color 0.3s, gap 0.4s var(--ease); }
-  .tile:hover .tile-open { color: var(--accent); gap: 8px; }
+  .tile-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: color 0.3s, gap 0.5s var(--ease);
+  }
+  .tile-open :global(svg) { transition: transform 0.5s var(--ease); }
+  .tile:hover .tile-open { color: var(--accent); gap: 10px; }
 
   /* featured: wide card, image beside text */
   .tile-featured { grid-column: 1 / -1; flex-direction: row; }
@@ -479,7 +514,41 @@ const md = (s: string) =>
   .tile-featured .tile-body { padding: clamp(22px, 3vw, 36px); justify-content: center; }
   .tile-featured .tile-title { font-size: clamp(28px, 3vw, 38px); }
   .tile-featured .tile-one { flex: 0; font-size: 16px; margin-bottom: 8px; }
-  .tile-featured .tile-foot { margin-top: 16px; }
+  .tile-featured .tile-open { margin-top: 18px; }
+
+  /* course projects: quiet rows */
+  .rows { border-bottom: 1px solid var(--line); }
+  .rows li { background-position: 0 0; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) auto;
+    grid-template-areas: 'title one arrow' 'meta one arrow';
+    column-gap: clamp(20px, 4vw, 48px);
+    row-gap: 4px;
+    align-items: center;
+    padding: 20px 14px;
+    margin: 0 -14px;
+    border-radius: 14px;
+    transition: background-color 0.5s var(--ease);
+  }
+  .row:hover { background: color-mix(in srgb, var(--bg-elev) 70%, transparent); }
+  .row-title { grid-area: title; font-family: var(--serif); font-size: clamp(20px, 2.2vw, 24px); line-height: 1.2; color: var(--ink); width: fit-content; transition: color 0.3s, translate 0.6s var(--ease); }
+  .row-meta { grid-area: meta; font-family: var(--mono); font-size: 11.5px; color: var(--muted); transition: translate 0.6s var(--ease) 0.03s; }
+  .row-one { grid-area: one; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+  .row-arrow {
+    grid-area: arrow;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    color: var(--muted);
+    transition: background-color 0.4s, border-color 0.4s, color 0.4s, transform 0.6s var(--ease);
+  }
+  .row:hover .row-title { color: var(--accent); translate: 6px 0; }
+  .row:hover .row-meta { translate: 6px 0; }
+  .row:hover .row-arrow { background: var(--accent); border-color: var(--accent); color: #fff; transform: rotate(45deg); }
 
   /* ── Academics ── */
   .kit { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 48px; }
@@ -514,18 +583,14 @@ const md = (s: string) =>
     position: relative;
     overflow: hidden;
   }
+  /* warm glow that drifts toward the cursor */
   .contact-card::after {
-    content: '';
-    position: absolute;
-    right: -120px;
-    top: -120px;
-    width: 380px;
-    height: 380px;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 55%, transparent), transparent);
-    opacity: 0.6;
-    pointer-events: none;
+    opacity: 0.55;
+    background: radial-gradient(520px circle at var(--mx, 92%) var(--my, 4%), color-mix(in srgb, var(--accent) 42%, transparent), transparent 62%);
+    transition: opacity 0.8s var(--ease);
   }
+  .contact-card:hover::after { opacity: 0.8; }
+  .contact-card > :global(*) { position: relative; z-index: 3; }
   .contact-card .eyebrow { color: var(--accent); }
   .contact-title { font-family: var(--serif); font-size: clamp(36px, 6vw, 64px); line-height: 1.05; letter-spacing: -0.02em; margin: 14px 0 14px; }
   .contact-text { opacity: 0.75; max-width: 520px; font-size: 17px; }
@@ -542,7 +607,7 @@ const md = (s: string) =>
     transition: color 0.3s, border-color 0.3s, gap 0.5s var(--ease);
   }
   .contact-mail:hover { color: var(--accent); border-color: var(--accent); gap: 18px; }
-  .contact-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; position: relative; z-index: 1; }
+  .contact-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
   .contact-links .btn { background: transparent; color: var(--bg); border-color: color-mix(in srgb, var(--bg) 25%, transparent); }
   .contact-links .btn:hover { color: var(--accent); border-color: var(--accent); }
 
@@ -564,6 +629,9 @@ const md = (s: string) =>
   }
   @media (max-width: 600px) {
     .tiles { grid-template-columns: minmax(0, 1fr); }
+    .row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'title arrow' 'meta arrow' 'one one'; row-gap: 6px; }
+    .row-one { margin-top: 4px; }
+    .row-arrow { width: 34px; height: 34px; }
   }
   @media (max-width: 560px) {
     .edu li { flex-direction: column; gap: 6px; }
@@ -574,5 +642,7 @@ const md = (s: string) =>
   }
   @media (prefers-reduced-motion: reduce) {
     .ch, .fade { transform: none; opacity: 1; filter: none; animation: none; }
+    .me-frame { clip-path: none; animation: none; }
+    .me-frame :global(img) { transform: none; animation: none; }
   }
 </style>

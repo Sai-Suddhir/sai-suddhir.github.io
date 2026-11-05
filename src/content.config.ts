@@ -17,7 +17,7 @@ const work = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      group: z.enum(['research', 'projects', 'industry']),
+      group: z.enum(['research', 'projects', 'industry', 'course']),
       order: z.number(), // position within its group on the home page
       oneLiner: z.string(), // shown in the list on the home page
       org: z.string().optional(),
@@ -47,6 +47,9 @@ const work = defineCollection({
       links: z.array(z.object({ label: z.string(), url: z.string() })).default([]),
       // YouTube video id (e.g. dQw4w9WgXcQ) or a file in public/work/<id>/
       video: z.string().optional(),
+      // Photos still to be added. Each shows as an empty frame on the local
+      // preview only (npm run dev) and is hidden on the live site.
+      wanted: z.array(z.string()).default([]),
     }),
 });
 

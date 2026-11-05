@@ -1,17 +1,13 @@
 ---
-title: Bidirectional Multi-Output DAB Converter
-group: projects
-order: 2
-oneLiner: 500 V → 48 V / 12 V, 100 kHz, 96.2% efficient in simulation.
-role: "Course project · Power Electronics & Motor Drives (ED5231)"
+title: "Bidirectional Power Conversion for EVs"
+group: course
+order: 1
+oneLiner: "An isolated converter that lets power flow both ways between an EV's high-voltage battery and its low-voltage systems."
+role: "Power Electronics & Motor Drives (ED5231)"
 period: "Jul – Nov '25"
 cover: ./simulink-model.png
 coverAlt: Simulink model of the dual-active-bridge converter
 tags: [Simulink, Dual-active bridge, SiC, ZVS, Planar transformer]
-highlights:
-  - { value: "96.2%", label: "efficiency in simulation" }
-  - { value: "100 kHz", label: "switching frequency" }
-  - { value: "500 → 48/12 V", label: "bidirectional, multi-output" }
 documents:
   - { title: "Project report", file: project-report.pdf, kind: report, note: "With M Prithish Kumar" }
 ---

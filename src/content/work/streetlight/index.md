@@ -1,15 +1,18 @@
 ---
-title: RTC-Based Street-Light Timer
+title: "Automating a City's Street Lights"
 group: projects
 order: 6
-oneLiner: PCB and firmware now running 2000+ street lights in Coimbatore.
+oneLiner: "A simple, low-cost timer that now switches thousands of street lights across Coimbatore."
 org: ROLFS, Chennai
 role: PCB & firmware design
 tags: [ATtiny85, RTC, I²C, PCB design]
-highlights:
-  - { value: "2000+", label: "street lights in Coimbatore" }
+highlights: 
+  - { value: "Thousands", label: "of street lights across Coimbatore run on it" }
 gallery:
   - { src: ./timer-schematic.jpg, caption: "Timer circuit schematic" }
+wanted: 
+  - "Assembled timer board"
+  - "A unit installed in the field"
 ---
 
 ## Problem

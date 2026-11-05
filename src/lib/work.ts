@@ -6,6 +6,7 @@ export const GROUPS = [
   { key: 'research', label: 'Research' },
   { key: 'projects', label: 'Projects' },
   { key: 'industry', label: 'Industry' },
+  { key: 'course', label: 'Course projects' },
 ] as const;
 
 export const groupLabel = (g: Work['data']['group']) => GROUPS.find((x) => x.key === g)?.label ?? g;

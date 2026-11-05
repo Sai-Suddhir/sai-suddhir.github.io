@@ -1,9 +1,9 @@
 ---
-title: Real-Time Digital Control Firmware on TI C2000
-group: projects
-order: 5
-oneLiner: SPWM, harmonic injection and active PFC on the F28379D.
-role: "Course project · Digital Controller for Power Applications (EE5212)"
+title: "Digital Control of Power Converters"
+group: course
+order: 3
+oneLiner: "Real-time firmware that turns a microcontroller into a converter's controller: modulation, power-factor correction and protection."
+role: "Digital Controller for Power Applications (EE5212)"
 period: "Jan – May '26"
 tags: [TI F28379D, Embedded C, PFC, lag compensator, controller]
 ---

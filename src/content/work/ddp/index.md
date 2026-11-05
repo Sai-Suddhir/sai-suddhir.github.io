@@ -1,8 +1,8 @@
 ---
-title: Geometric Boundary Control for Split DC‑Link Inverters
+title: "Geometric Control for Split DC-Link Inverters"
 group: research
 order: 1
-oneLiner: A switching surface that equalizes split DC-link capacitors in a single switching action. Paper under review at ICPE 2027.
+oneLiner: "Rebalancing an inverter's capacitors by following the circuit's own natural trajectories. Paper under review at ICPE 2027."
 role: Dual-Degree Project
 period: "May '26 – Present"
 advisor: Prof. Srikanthan Sridharan
@@ -10,15 +10,15 @@ status: Ongoing · paper under review at ICPE 2027
 cover: ./state-trajectories.png
 coverAlt: State trajectories of the two-quadrant chopper, with the proposed second-order switching surface highlighted
 tags: [Boundary control, 3-level NPC, DSTATCOM, Two-quadrant chopper, Nonlinear control]
-highlights:
-  - { value: "1", label: "switching action to remove a 25.2 V imbalance, settling within 5 ms" }
-  - { value: "13×", label: "fewer switching actions with ripple compensation (140/s vs 1865/s)" }
-  - { value: "18.1 A", label: "simulated peak inductor current, against 18.3 A predicted in closed form" }
+highlights: 
+  - { value: "One step", label: "an imbalance is corrected in a single switching action" }
+  - { value: "Far fewer", label: "switching actions once the ripple is predicted and cancelled" }
+  - { value: "Closed form", label: "peak current known analytically, before it happens" }
 gallery:
   - { src: ./npc-dstatcom.png, caption: "Three-level NPC DSTATCOM with the balancing chopper" }
   - { src: ./multi-step-control.png, caption: "Multi-step boundary control: the peak current is capped at an adjustable limit" }
   - { src: ./results-single-step.png, caption: "Direct application: capacitor voltages equalize almost immediately once the chopper is enabled" }
-  - { src: ./results-ripple-compensated.png, caption: "Ripple-compensated application: same drift removal with about 13× fewer switching actions" }
+  - { src: ./results-ripple-compensated.png, caption: "Ripple-compensated application: the same drift removal with far fewer switching actions" }
   - { src: ./results-dynamic-loading.png, caption: "Dynamic loading: the dc neutral current reverses twice and the capacitors stay balanced" }
 documents:
   - { title: "A Geometric Control Approach for DC-Link Voltage Equalization in Split-Capacitor Inverters", file: icpe-2027-digest.pdf, kind: paper, note: "ICPE 2027 digest · 6 pages · under review" }
@@ -50,7 +50,7 @@ In a DSTATCOM, the neutral current makes the capacitors both **drift** (its dc p
 Simulated on a three-level NPC DSTATCOM with a 1200 V DC link, C = 2200 µF and a 100 mH chopper inductor:
 
 - **Direct application:** a 25.2 V imbalance is removed in a **single switching action**, settling within **5 ms**. The inductor current peaks at **18.1 A**, against **18.3 A** predicted by the closed-form expression. The capacitor difference then stays within about ±0.4 V.
-- **Ripple-compensated application:** the drift is removed just as well, with **140 switching actions per second instead of 1865**, about **13× fewer**. The capacitor means differ by only 0.2 V.
+- **Ripple-compensated application:** the drift is removed just as well, with **an order of magnitude fewer switching actions** (140 per second instead of 1865). The capacitor means differ by only 0.2 V.
 - **Dynamic loading:** with multi-step control limited to 6 A, the chopper settles in **10.4 ms**. Two load steps then reverse the dc neutral current, from −0.13 A to 1.14 A and then to −1.39 A, and the capacitor voltages stay balanced throughout.
 
 ## What's next in my thesis

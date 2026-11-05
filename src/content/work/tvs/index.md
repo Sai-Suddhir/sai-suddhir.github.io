@@ -2,13 +2,13 @@
 title: TVS Motor Company
 group: industry
 order: 1
-oneLiner: Retrofitted brake-fluid filling machines for ABS; $200k+ projected savings.
+oneLiner: "Taught existing production-line machines to fill ABS brakes, instead of replacing them."
 org: TVS Motor Company, Hosur
 role: Production Engineering Intern
 period: "Jul '25"
 tags: [CAN, ISO-TP, OPC UA, PLC, Python]
-highlights:
-  - { value: "$200k+", label: "projected savings in upgrade costs" }
+highlights: 
+  - { value: "Full-time offer", label: "and a commendation from the VP, Production" }
 ---
 
 ## What I did

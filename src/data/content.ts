@@ -8,6 +8,11 @@
 
 export const isTodo = (v?: string) => !v || v.startsWith('TODO');
 
+export const site = {
+  // A small note at the bottom of every page. Set to '' to remove it.
+  wip: "Still being built: this isn't the final version of the site.",
+};
+
 export const profile = {
   name: 'Sai Suddhir A B',
   institution: 'IIT Madras',

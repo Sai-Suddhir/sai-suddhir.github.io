@@ -2,7 +2,7 @@
 title: Arctus Aerospace
 group: industry
 order: 2
-oneLiner: UAV ground-control-station hardware, PCBs and firmware.
+oneLiner: "Ground-station hardware and onboard electronics for high-altitude UAVs."
 org: Arctus Aerospace, Bangalore
 role: Hardware Engineering Intern
 period: "Dec '24, Jun '25, Dec '25"

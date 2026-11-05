@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
-import { profile } from '../data/content';
+import { profile, site } from '../data/content';
 
 interface Props { title?: string; description?: string }
 const { title = profile.name, description = `${profile.name}. ${profile.tagline}` } = Astro.props;
@@ -70,6 +70,14 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
     <main id="main">
       <slot />
     </main>
+
+    {site.wip && (
+      <aside class="wip" role="status">
+        <span class="wip-dot" aria-hidden="true"></span>
+        <span class="wip-text">{site.wip}</span>
+        <button type="button" aria-label="Dismiss">×</button>
+      </aside>
+    )}
 
     <footer class="site-footer">
       <div class="container foot">
@@ -260,7 +268,65 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
   }
   .foot-links { display: flex; gap: 18px; }
 
+  /* ── Work-in-progress note ── */
+  .wip {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    max-width: calc(100vw - 32px);
+    margin: 0 auto;
+    padding: 8px 8px 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg-elev) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    color: var(--ink-2);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: opacity 0.7s var(--ease), transform 0.9s var(--ease);
+  }
+  .wip:global(.is-shown) { opacity: 1; pointer-events: auto; transform: none; }
+  .wip-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: relative; }
+  .wip-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    opacity: 0;
+    animation: wip-ping 2.4s var(--ease) infinite;
+  }
+  @keyframes wip-ping { 0% { transform: scale(0.4); opacity: 0.7; } 80%, 100% { transform: scale(1.5); opacity: 0; } }
+  .wip-text { line-height: 1.35; }
+  .wip button {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .wip button:hover { background: var(--accent-soft); color: var(--accent); }
+
   @media (max-width: 480px) {
+    .wip { bottom: 12px; font-size: 12.5px; }
     .site-header { top: 10px; padding: 0 8px; }
     .nav-links a { padding: 7px 10px; font-size: 13px; }
     .sep { margin: 0 2px; }

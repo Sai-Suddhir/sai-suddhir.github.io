@@ -1,8 +1,8 @@
 ---
-title: "Avishkar Hyperloop: Pod Electronics"
+title: "Electronics for a Hyperloop Pod"
 group: projects
 order: 1
-oneLiner: Led the electrical team; 1st in Asia at European Hyperloop Week 2024.
+oneLiner: "Led the electrical team behind the pod's propulsion, levitation and safety electronics. 1st in Asia at European Hyperloop Week 2024."
 org: Avishkar Hyperloop, IIT Madras
 role: Electrical Team Lead
 period: "Sep '23 – Nov '24"
@@ -10,15 +10,19 @@ status: 1st in Asia, 5th overall · European Hyperloop Week 2024
 cover: ./pcu-render.png
 coverAlt: 3D render of the propulsion control board designed for Avishkar Hyperloop
 tags: [TI F28379D, MSP432, TI-RTOS, CAN, Altium, Stateflow]
-highlights:
-  - { value: "1st", label: "in Asia at European Hyperloop Week 2024" }
-  - { value: "300+", label: "messages on the pod-wide CAN network" }
-  - { value: "130+", label: "fault cases in the fault-handling FSM" }
+highlights: 
+  - { value: "1st in Asia", label: "European Hyperloop Week 2024, Zurich" }
+  - { value: "Pod-wide", label: "one communication network tying every subsystem together" }
+  - { value: "Fail-safe", label: "fault handling designed in from the start" }
 gallery:
   - { src: ./levitation-layout.png, caption: "Levitation module PCB: layout" }
   - { src: ./levitation-board.png, caption: "Levitation module PCB: 3D view" }
 documents:
   - { title: "Levitation module PCB schematic", file: levitation-schematic.pdf, kind: schematic, note: "6 pages" }
+wanted: 
+  - "The pod at European Hyperloop Week 2024"
+  - "Team photo in Zurich"
+  - "Assembled propulsion control board"
 ---
 
 ## Overview
