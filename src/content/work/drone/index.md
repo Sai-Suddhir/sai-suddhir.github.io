@@ -6,8 +6,11 @@ oneLiner: "A flight controller designed from scratch, so that building a swarm o
 org: Aero Club, IIT Madras
 role: Embedded Systems Engineer
 period: "Sep '23 – Nov '24"
-cover: ./fc-layout.png
-coverAlt: PCB layout of the custom STM32 drone flight controller
+cover: ./fc-render.png
+coverAlt: 3D render of the custom STM32 drone flight controller
+gallery:
+  - { src: ./fc-layout.png, caption: "Board layout" }
+  - { src: ./anti-collision.png, caption: "Simulating three drones steering clear of each other" }
 tags: [STM32, PCB design, EMI filtering, Python]
 documents:
   - { title: "Flight controller schematic", file: fc-schematic.pdf, kind: schematic }

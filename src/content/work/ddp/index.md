@@ -15,6 +15,7 @@ highlights:
   - { value: "Far fewer", label: "switching actions once the ripple is predicted and cancelled" }
   - { value: "Closed form", label: "peak current known analytically, before it happens" }
 gallery:
+  - { src: ./chopper.png, caption: "The two-quadrant chopper: an inductor moves charge between the two capacitors" }
   - { src: ./npc-dstatcom.png, caption: "Three-level NPC DSTATCOM with the balancing chopper" }
   - { src: ./multi-step-control.png, caption: "Multi-step boundary control: the peak current is capped at an adjustable limit" }
   - { src: ./results-single-step.png, caption: "Direct application: capacitor voltages equalize almost immediately once the chopper is enabled" }

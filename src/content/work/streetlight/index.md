@@ -8,7 +8,10 @@ role: PCB & firmware design
 tags: [ATtiny85, RTC, I²C, PCB design]
 highlights: 
   - { value: "Thousands", label: "of street lights across Coimbatore run on it" }
+cover: ./etched-board.jpg
+coverAlt: An etched timer PCB, before assembly
 gallery:
+  - { src: ./sketch.jpg, caption: "Where it started: a hand sketch of the circuit" }
   - { src: ./timer-schematic.jpg, caption: "Timer circuit schematic" }
 wanted: 
   - "Assembled timer board"
