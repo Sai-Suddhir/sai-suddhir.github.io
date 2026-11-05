@@ -102,7 +102,7 @@ export const coursework = [
       { name: 'Digital Controller for Power Applications (EE5212)', grade: 'S' },
       { name: 'Switched Mode Power Conversion (EE5200)', grade: 'A' },
       { name: 'Power Converter Analysis & Design' },
-      { name: 'Power Electronics & Motor Drives (ED5231)' },
+      { name: 'Power Electronics & Motor Drives for Electrified Vehicles (ED5235)' },
       { name: 'Electric Machines' },
       { name: 'Battery Technology' },
       { name: 'EV Engineering & Development' },
