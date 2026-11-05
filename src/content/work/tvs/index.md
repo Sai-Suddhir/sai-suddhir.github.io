@@ -9,6 +9,10 @@ period: "Jul '25"
 tags: [CAN, UDS, ISO-TP, OPC UA, PLC, Python]
 highlights: 
   - { value: "Full-time offer", label: "and a commendation from the VP, Production" }
+gallery:
+  - { src: ./fill-cycle.png, caption: "The fill cycle of a conventional machine, stage by stage" }
+  - { src: ./retrofit-hook.png, caption: "Where the new software layer hooks into the machine's existing cycle" }
+  - { src: ./closed-loop.png, caption: "The closed-loop sequence: each step waits for the machine to confirm the last" }
 ---
 
 ## The problem

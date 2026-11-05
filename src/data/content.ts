@@ -16,7 +16,7 @@ export const site = {
 export const profile = {
   name: 'Sai Suddhir A B',
   institution: 'IIT Madras',
-  email: 'ae22b013@smail.iitm.ac.in',
+  email: 'saisuddhir28@gmail.com',
   links: {
     github: 'https://github.com/Sai-Suddhir',
     linkedin: 'https://www.linkedin.com/in/saisuddhir',
