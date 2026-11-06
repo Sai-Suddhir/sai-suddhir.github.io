@@ -3,7 +3,7 @@ title: "Bidirectional Power Conversion for EVs"
 group: course
 order: 1
 oneLiner: "An isolated converter that lets power flow both ways between an EV's high-voltage battery and its low-voltage systems."
-role: "Power Electronics & Motor Drives for Electrified Vehicles (ED5235)"
+role: "Power Electronics & Motor Drives for Electrified Vehicles"
 period: "Jan – May '25"
 cover: ./simulink-model.png
 coverAlt: Simulink model of the dual-active-bridge converter

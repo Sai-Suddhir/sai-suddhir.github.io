@@ -3,7 +3,7 @@ title: "Data-Driven Thermal Models for EV Batteries"
 group: course
 order: 4
 oneLiner: "Comparing data-driven ways to predict how a battery cell heats up, without running a full simulation."
-role: "Data Driven Modelling of Aerospace Systems (AS5401)"
+role: "Data Driven Modelling of Aerospace Systems"
 cover: ./heat-source.png
 coverAlt: Heat generated across a Li-ion cell, concentrated near the tabs, with a cold plate along the base
 tags: [Data-driven modelling, Li-ion, Thermal]

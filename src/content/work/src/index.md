@@ -3,7 +3,7 @@ title: "Resonant DC-DC Conversion for Telecom Power"
 group: course
 order: 2
 oneLiner: "A soft-switching converter that steps a high-voltage bus down for telecom equipment, with very little lost as heat."
-role: "Switched Mode Power Conversion (EE5203)"
+role: "Switched Mode Power Conversion"
 period: "Jan – May '26"
 tags: [PLECS, Resonant converters, FHA, Magnetics]
 ---

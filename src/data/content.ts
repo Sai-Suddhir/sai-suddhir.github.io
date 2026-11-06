@@ -92,20 +92,20 @@ export const publications = [
 // Research, projects and industry items live in src/content/work/<id>/index.md
 
 /* ── Academics ───────────────────────────────────────────── */
-export const teaching = ['Analog & Digital Electronics (ED2130)', 'Switched Mode Power Conversion (EE5200)'];
+export const teaching = ['Analog & Digital Electronics', 'Switched Mode Power Conversion'];
 
-// From the IIT Madras grade card (Aug 2026): electrical, control, computing
-// and maths courses only. `grade` is optional; leave it out to hide it.
+// Electrical, control, computing and maths courses only (no aerospace).
+// `grade` is optional; leave it out to hide it.
 export const coursework = [
   {
     group: 'Power Electronics & EVs',
     items: [
-      { name: 'Digital Controller for Power Applications (EE5212)', grade: 'S' },
-      { name: 'Switched Mode Power Conversion (EE5203)', grade: 'A' },
-      { name: 'Power Converter Analysis & Design (EE5200)' },
-      { name: 'Power Electronics & Motor Drives for Electrified Vehicles (ED5235)', grade: 'A' },
-      { name: 'Electric Vehicle Engineering & Development (ED5350)', grade: 'S' },
-      { name: 'Vehicle Dynamics (ED5220)', grade: 'A' },
+      { name: 'Digital Controller for Power Applications', grade: 'S' },
+      { name: 'Switched Mode Power Conversion', grade: 'A' },
+      { name: 'Power Converter Analysis & Design' },
+      { name: 'Power Electronics & Motor Drives for Electrified Vehicles', grade: 'A' },
+      { name: 'Electric Vehicle Engineering & Development', grade: 'S' },
+      { name: 'Vehicle Dynamics', grade: 'A' },
       { name: 'Electric Machines' },
       { name: 'Battery Technology' },
     ],
@@ -113,28 +113,29 @@ export const coursework = [
   {
     group: 'Control & Robotics',
     items: [
-      { name: 'Linear Dynamical Systems (EE5413)', grade: 'A' },
-      { name: 'Control of Automotive Systems (ED5330)', grade: 'A' },
-      { name: 'Signals & Systems (EE1101)', grade: 'S' },
-      { name: 'Introduction to Field & Service Robotics (ED5315)' },
+      { name: 'Linear Dynamical Systems', grade: 'A' },
+      { name: 'Control of Automotive Systems', grade: 'A' },
+      { name: 'Signals & Systems', grade: 'S' },
+      { name: 'Introduction to Field & Service Robotics' },
     ],
   },
   {
     group: 'Computing & ML',
     items: [
-      { name: 'Machine Learning Foundations (OB2204)', grade: 'S' },
-      { name: 'Introduction to Scientific Computing (ID2090)', grade: 'A' },
+      { name: 'Machine Learning Foundations', grade: 'S' },
+      { name: 'Introduction to Scientific Computing', grade: 'A' },
+      { name: 'Data Driven Modelling of Aerospace Systems' },
     ],
   },
   {
     group: 'Mathematics',
     items: [
-      { name: 'Probability, Statistics & Stochastic Processes (MA2040)' },
-      { name: 'Complex Variables (MA2010)' },
-      { name: 'Differential Equations (MA2020)' },
-      { name: 'Functions of Several Variables (MA1101)', grade: 'A' },
-      { name: 'Series & Matrices (MA1102)' },
-      { name: 'Fundamentals of Operations Research (MS3510)' },
+      { name: 'Probability, Statistics & Stochastic Processes' },
+      { name: 'Complex Variables' },
+      { name: 'Differential Equations' },
+      { name: 'Functions of Several Variables', grade: 'A' },
+      { name: 'Series & Matrices' },
+      { name: 'Fundamentals of Operations Research' },
     ],
   },
 ];
