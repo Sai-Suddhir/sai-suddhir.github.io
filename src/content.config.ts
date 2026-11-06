@@ -26,6 +26,7 @@ const work = defineCollection({
       advisor: z.string().optional(),
       status: z.string().optional(),
       cover: image().optional(),
+      logo: image().optional(), // shown centred on the home-page card instead of a photo
       coverAlt: z.string().optional(),
       tags: z.array(z.string()).default([]),
       // big numbers shown under the title, e.g. { value: '96.2%', label: 'efficiency' }

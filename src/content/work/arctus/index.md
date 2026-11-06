@@ -6,6 +6,8 @@ oneLiner: "Ground-station hardware and onboard electronics for high-altitude UAV
 org: Arctus Aerospace, Bangalore
 role: Hardware Engineering Intern
 period: "Dec '24, Jun '25, Dec '25"
+cover: ./aerial.jpg
+coverAlt: Aerial view of roads and farmland, from Arctus Aerospace's website
 tags: [STM32, PCB design, UAVs]
 ---
 

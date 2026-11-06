@@ -6,6 +6,7 @@ oneLiner: "Taught existing production-line machines to fill ABS brakes, instead 
 org: TVS Motor Company, Hosur
 role: Production Engineering Intern
 period: "Jul '25"
+logo: ./tvs-logo.svg
 tags: [CAN, UDS, ISO-TP, OPC UA, PLC, Python]
 highlights: 
   - { value: "Full-time offer", label: "and a commendation from the VP, Production" }

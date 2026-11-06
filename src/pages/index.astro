@@ -182,8 +182,10 @@ const md = (s: string) =>
                 const thumb = d.cover ?? d.gallery[0]?.src; // fall back to the first gallery image
                 return (
                   <a class:list={['tile', { 'tile-featured': featured }]} href={`/work/${w.id}/`} data-reveal data-glow>
-                    <span class="tile-media" data-curtain>
-                      {thumb
+                    <span class:list={['tile-media', { 'tile-media-logo': d.logo }]} data-curtain>
+                      {d.logo
+                        ? <span class="tile-logo"><Image src={d.logo} alt={d.org ?? d.title} width={640} /></span>
+                        : thumb
                         ? <Image src={thumb} alt="" widths={featured ? [600, 900, 1200] : [400, 640]} sizes={featured ? '(max-width: 900px) 100vw, 640px' : '(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px'} />
                         : <TileArt id={w.id} title={d.title} group={d.group} />}
                     </span>
@@ -489,6 +491,18 @@ const md = (s: string) =>
   .tile-media { display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg); border-bottom: 1px solid var(--line); }
   .tile-media :global(img), .tile-media :global(svg) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
   .tile:hover .tile-media :global(img), .tile:hover .tile-media :global(svg) { transform: scale(1.05); }
+
+  /* company logo on a clean panel instead of a photo */
+  .tile-media-logo {
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(rgba(20, 23, 28, 0.045) 1px, transparent 1px) 0 0 / 20px 20px,
+      linear-gradient(90deg, rgba(20, 23, 28, 0.045) 1px, transparent 1px) 0 0 / 20px 20px,
+      #fbfaf7;
+  }
+  .tile-logo { display: grid; place-items: center; width: 100%; height: 100%; padding: 0 18%; }
+  .tile-media-logo :global(img) { width: 100%; height: auto; max-height: 34%; object-fit: contain; }
   .tile-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; flex: 1; }
   .tile-meta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
   .tile-title { font-family: var(--serif); font-size: 23px; line-height: 1.15; color: var(--ink); width: fit-content; transition: color 0.3s; }
