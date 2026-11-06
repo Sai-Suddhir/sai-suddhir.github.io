@@ -11,8 +11,14 @@ coverAlt: Aerial view of roads and farmland, from Arctus Aerospace's website
 tags: [STM32, PCB design, UAVs]
 ---
 
-## What I did
+## Ground control station
 
-- Architected and built a **modular ground control station** for high-altitude UAVs, from system integration and wiring to the enclosure, supporting manual and autonomous flight, real-time telemetry, FPV and in-flight tuning.
-- Designed **multilayer PCBs and STM32 firmware** for fuel, propulsion, braking, steering and battery systems.
+I architected and built a **modular ground control station** for high-altitude UAVs, from system integration and wiring to the enclosure. Everything packs into one rugged case, and it supports manual and autonomous flight, real-time telemetry, FPV video and in-flight tuning.
+
+![The ground control station built into a rugged case, open on the floor](./ground-station.jpg)
+*The finished station: displays in the lid; power, switches, a keyboard and the flight sticks in the base.*
+
+## Onboard electronics
+
+- Designed **multilayer PCBs and STM32 firmware** for the fuel, propulsion, braking, steering and battery systems.
 - Reverse-engineered **paramotor engine software**.
