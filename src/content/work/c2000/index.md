@@ -4,7 +4,7 @@ group: course
 order: 3
 oneLiner: "Real-time firmware that turns a microcontroller into a converter's controller: modulation, power-factor correction and protection."
 role: "Digital Controller for Power Applications (EE5212)"
-period: "Jan – May '26"
+period: "Jul – Nov '25"
 tags: [TI F28379D, Embedded C, PFC, lag compensator, controller]
 ---
 

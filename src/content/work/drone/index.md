@@ -14,6 +14,8 @@ gallery:
 tags: [STM32, PCB design, EMI filtering, Python]
 documents:
   - { title: "Flight controller schematic", file: fc-schematic.pdf, kind: schematic }
+code:
+  - { title: "Drone-swarm", url: "https://github.com/Sai-Suddhir/Drone-swarm", description: "Sensor drivers for the flight controller (BMP180 barometer, MPU IMU) and an early swarm-algorithm sketch." }
 wanted: 
   - "Assembled flight controller"
   - "A drone flying on it"

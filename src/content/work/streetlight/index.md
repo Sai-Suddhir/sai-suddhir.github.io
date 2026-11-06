@@ -13,6 +13,8 @@ coverAlt: An etched timer PCB, before assembly
 gallery:
   - { src: ./sketch.jpg, caption: "Where it started: a hand sketch of the circuit" }
   - { src: ./timer-schematic.jpg, caption: "Timer circuit schematic" }
+code:
+  - { title: "Timer-Project", url: "https://github.com/Sai-Suddhir/Timer-Project", description: "ATtiny85 firmware: setting the real-time clock, the switching program, and a serial read-back for testing." }
 wanted: 
   - "Assembled timer board"
   - "A unit installed in the field"

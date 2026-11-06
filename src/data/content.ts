@@ -94,31 +94,48 @@ export const publications = [
 /* ── Academics ───────────────────────────────────────────── */
 export const teaching = ['Analog & Digital Electronics (ED2130)', 'Switched Mode Power Conversion (EE5200)'];
 
-// `grade` is optional.
+// From the IIT Madras grade card (Aug 2026): electrical, control, computing
+// and maths courses only. `grade` is optional; leave it out to hide it.
 export const coursework = [
   {
-    group: 'Power Electronics',
+    group: 'Power Electronics & EVs',
     items: [
       { name: 'Digital Controller for Power Applications (EE5212)', grade: 'S' },
-      { name: 'Switched Mode Power Conversion (EE5200)', grade: 'A' },
-      { name: 'Power Converter Analysis & Design' },
-      { name: 'Power Electronics & Motor Drives for Electrified Vehicles (ED5235)' },
+      { name: 'Switched Mode Power Conversion (EE5203)', grade: 'A' },
+      { name: 'Power Converter Analysis & Design (EE5200)' },
+      { name: 'Power Electronics & Motor Drives for Electrified Vehicles (ED5235)', grade: 'A' },
+      { name: 'Electric Vehicle Engineering & Development (ED5350)', grade: 'S' },
+      { name: 'Vehicle Dynamics (ED5220)', grade: 'A' },
       { name: 'Electric Machines' },
       { name: 'Battery Technology' },
-      { name: 'EV Engineering & Development' },
     ],
   },
   {
-    group: 'Controls',
-    items: [{ name: 'Linear Dynamical Systems' }, { name: 'Control of Automotive Systems' }, { name: 'Signals & Systems' }],
+    group: 'Control & Robotics',
+    items: [
+      { name: 'Linear Dynamical Systems (EE5413)', grade: 'A' },
+      { name: 'Control of Automotive Systems (ED5330)', grade: 'A' },
+      { name: 'Signals & Systems (EE1101)', grade: 'S' },
+      { name: 'Introduction to Field & Service Robotics (ED5315)' },
+    ],
   },
   {
-    group: 'Data & ML',
-    items: [{ name: 'Data Driven Modelling of Aerospace Systems (AS5401)' }, { name: 'TODO: machine learning course name and code' }],
+    group: 'Computing & ML',
+    items: [
+      { name: 'Machine Learning Foundations (OB2204)', grade: 'S' },
+      { name: 'Introduction to Scientific Computing (ID2090)', grade: 'A' },
+    ],
   },
   {
     group: 'Mathematics',
-    items: [{ name: 'Probability, Statistics & Stochastic Processes' }, { name: 'Complex Variables' }, { name: 'Differential Equations' }],
+    items: [
+      { name: 'Probability, Statistics & Stochastic Processes (MA2040)' },
+      { name: 'Complex Variables (MA2010)' },
+      { name: 'Differential Equations (MA2020)' },
+      { name: 'Functions of Several Variables (MA1101)', grade: 'A' },
+      { name: 'Series & Matrices (MA1102)' },
+      { name: 'Fundamentals of Operations Research (MS3510)' },
+    ],
   },
 ];
 
