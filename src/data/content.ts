@@ -95,17 +95,17 @@ export const publications = [
 export const teaching = ['Analog & Digital Electronics', 'Switched Mode Power Conversion'];
 
 // Electrical, control, computing and maths courses only (no aerospace).
-// `grade` is optional; leave it out to hide it.
+// Course names only; grades are deliberately not shown.
 export const coursework = [
   {
     group: 'Power Electronics & EVs',
     items: [
-      { name: 'Digital Controller for Power Applications', grade: 'S' },
-      { name: 'Switched Mode Power Conversion', grade: 'A' },
+      { name: 'Digital Controller for Power Applications' },
+      { name: 'Switched Mode Power Conversion' },
       { name: 'Power Converter Analysis & Design' },
-      { name: 'Power Electronics & Motor Drives for Electrified Vehicles', grade: 'A' },
-      { name: 'Electric Vehicle Engineering & Development', grade: 'S' },
-      { name: 'Vehicle Dynamics', grade: 'A' },
+      { name: 'Power Electronics & Motor Drives for Electrified Vehicles' },
+      { name: 'Electric Vehicle Engineering & Development' },
+      { name: 'Vehicle Dynamics' },
       { name: 'Electric Machines' },
       { name: 'Battery Technology' },
     ],
@@ -113,17 +113,17 @@ export const coursework = [
   {
     group: 'Control & Robotics',
     items: [
-      { name: 'Linear Dynamical Systems', grade: 'A' },
-      { name: 'Control of Automotive Systems', grade: 'A' },
-      { name: 'Signals & Systems', grade: 'S' },
+      { name: 'Linear Dynamical Systems' },
+      { name: 'Control of Automotive Systems' },
+      { name: 'Signals & Systems' },
       { name: 'Introduction to Field & Service Robotics' },
     ],
   },
   {
     group: 'Computing & ML',
     items: [
-      { name: 'Machine Learning Foundations', grade: 'S' },
-      { name: 'Introduction to Scientific Computing', grade: 'A' },
+      { name: 'Machine Learning Foundations' },
+      { name: 'Introduction to Scientific Computing' },
       { name: 'Data Driven Modelling of Aerospace Systems' },
     ],
   },
@@ -133,7 +133,7 @@ export const coursework = [
       { name: 'Probability, Statistics & Stochastic Processes' },
       { name: 'Complex Variables' },
       { name: 'Differential Equations' },
-      { name: 'Functions of Several Variables', grade: 'A' },
+      { name: 'Functions of Several Variables' },
       { name: 'Series & Matrices' },
       { name: 'Fundamentals of Operations Research' },
     ],
