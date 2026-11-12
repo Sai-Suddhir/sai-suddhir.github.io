@@ -16,7 +16,7 @@ export const site = {
 // Options for the one line under your name on the home page.
 // To switch, change the number in `role: roleOptions[0]` below. Option 5 hides the line.
 export const roleOptions = [
-  /* 0 */ 'I build power electronics, from the control law to the circuit board.',
+  /* 0 */ 'I build things. Sometimes they work the first time.',
   /* 1 */ 'Electrical and electronics engineer at IIT Madras. I like taking an idea from the maths to working hardware.',
   /* 2 */ 'Aerospace by degree, electrical by choice.',
   /* 3 */ 'Dual-degree student at IIT Madras, working on power electronics, control and embedded systems.',
