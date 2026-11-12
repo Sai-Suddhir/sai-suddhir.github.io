@@ -62,8 +62,8 @@ export const intro = {
   quote: quoteOptions[0],
   // Your own introduction goes here, one string per paragraph.
   paragraphs: [
-    "I'm Sai, a dual-degree student at **IIT Madras**. I picked aerospace because of **Dr. A.P.J. Abdul Kalam**, then found myself pulled toward electrical engineering, and taught myself most of it one board at a time. These days I spend my time on power converters and the control behind them.",
-    "Away from the lab, I'm a trained **Carnatic vocalist and keyboardist**, and jamming with friends is my favourite way to unwind. I captained my school cricket team, try to keep fitness part of every day, write the occasional essay, and I'm usually the first one excited about a late-night outing or a trip somewhere new.",
+    "I’m Sai, a final-year dual-degree student at IIT Madras. I realised early on that I stayed far more awake in electrical classes than in aerodynamics, so I chose to pursue electrical engineering. I taught myself most of the prerequisites, took advanced electrical courses, and built on them through research projects with professors here. I now have a couple of internships and a paper under review to my name.",
+    "Outside academics, I enjoy the gym, sports, gaming and reading biographies. I am comfortable managing several things at once and I stay composed under pressure. I believe I have the skills and the potential to create an impact, and I want to keep building on them through research and hands-on engineering",
   ],
 };
 
