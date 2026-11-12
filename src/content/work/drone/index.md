@@ -16,21 +16,23 @@ documents:
   - { title: "Flight controller schematic", file: fc-schematic.pdf, kind: schematic }
 code:
   - { title: "Drone-swarm", url: "https://github.com/Sai-Suddhir/Drone-swarm", description: "Sensor drivers for the flight controller (BMP180 barometer, MPU IMU) and an early swarm-algorithm sketch." }
+highlights:
+  - { value: "70%", label: "cheaper than a commercial Pixhawk" }
 wanted: 
   - "Assembled flight controller"
   - "A drone flying on it"
 ---
 
-## Problem
+## Why we built our own
 
-Commercial flight controllers cost around ₹12k each. With drone swarming as the end goal, building 100 drones that way would be very expensive, and an off-the-shelf board leaves many capabilities unused for our use case.
+A commercial flight controller costs around ₹12,000. Our goal at the Aero Club was drone swarming, and a swarm of 100 drones at that price was far too expensive. An off-the-shelf board also comes with a lot of capability we would never have used.
 
-## What I did
+## The board
 
-- Designed a **custom flight controller around an STM32** microcontroller, integrating telemetry, the swarm algorithm and precise motor control on one board.
-- Added **filtering** throughout the circuitry, since the sensor data was susceptible to electromagnetic interference.
-- Modelled a **3-body anti-collision algorithm** in Python (NumPy, Shapely) with an 85% success rate.
+I designed a flight controller around an STM32 that puts telemetry, the swarm algorithm and precise motor control on a single board. The sensor data turned out to be sensitive to electromagnetic interference, so I added filtering throughout the circuit.
 
-## Result
+It cut the hardware cost by 70% compared with a commercial Pixhawk.
 
-The board cut hardware cost by **70%** compared with a commercial Pixhawk.
+## The swarm side
+
+To go with the board, I modelled a three-body anti-collision algorithm in Python using NumPy and Shapely. It reached an 85% success rate.

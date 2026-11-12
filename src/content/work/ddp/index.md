@@ -27,17 +27,17 @@ documents:
 
 ## The problem
 
-Split-capacitor inverters, such as the three-level neutral-point-clamped (NPC) **DSTATCOM**, keep their two DC-link capacitors in series. When unbalanced or nonlinear loads push a **dc component** into the neutral current, the capacitor voltages drift apart permanently. This major imbalance degrades the compensator's current tracking.
+Split-capacitor inverters, such as the three-level neutral-point-clamped (NPC) **DSTATCOM**, keep their two DC-link capacitors in series. When unbalanced or nonlinear loads push a dc component into the neutral current, the capacitor voltages drift apart and stay apart. That imbalance degrades the compensator's current tracking.
 
-A two-quadrant chopper is the usual fix. It moves charge between the capacitors through an inductor at their midpoint. But existing chopper controllers switch continuously, respond slowly, and some need parameters chosen in advance from the expected load. None of them use the chopper's own natural trajectories.
+A two-quadrant chopper is the usual fix. It moves charge between the capacitors through an inductor at their midpoint. The existing chopper controllers switch continuously and respond slowly, and some need parameters chosen in advance from the expected load. None of them use the chopper's own natural trajectories.
 
 ## The idea
 
 **Boundary control** picks a switching surface from how a converter's states naturally evolve. I applied that idea to the chopper.
 
-- Modelling the chopper with the voltage imbalance *e* and inductor current *i<sub>L</sub>* as states, its trajectories turn out to be **two families of concentric ellipses** that can be written in closed form.
-- The arcs of those ellipses that pass through the balanced point form a **second-order switching surface**. Since the surface *is* a natural trajectory, the state slides onto the balanced point and an imbalance is removed in a **single switching action**.
-- The peak inductor current of that single action is set by the circuit, not the controller, and I derived it in closed form. A **multi-step variant** turns the switch off at an adjustable current limit, lets the current freewheel to zero and switches again. That caps the peak current, and every turn-on happens at zero current.
+- With the voltage imbalance *e* and the inductor current *i<sub>L</sub>* as states, the chopper's trajectories turn out to be two families of concentric ellipses that can be written in closed form.
+- The arcs of those ellipses that pass through the balanced point form a second-order switching surface. The surface is itself a natural trajectory, so the state rides it to the balanced point and an imbalance is removed in a single switching action.
+- The peak inductor current of that single action is set by the circuit, not the controller, and I derived it in closed form. A multi-step variant turns the switch off at an adjustable current limit, lets the current freewheel to zero and switches again. That caps the peak current, and every turn-on happens at zero current.
 
 ## Applying it to a DSTATCOM
 
@@ -50,14 +50,14 @@ In a DSTATCOM, the neutral current makes the capacitors both **drift** (its dc p
 
 Simulated on a three-level NPC DSTATCOM with a 1200 V DC link, C = 2200 µF and a 100 mH chopper inductor.
 
-- **Direct application.** A 25.2 V imbalance is removed in a **single switching action**, settling within **5 ms**. The inductor current peaks at **18.1 A**, against **18.3 A** predicted by the closed-form expression. The capacitor difference then stays within about ±0.4 V.
-- **Ripple-compensated application.** The drift is removed just as well, with **an order of magnitude fewer switching actions** (140 per second instead of 1865). The capacitor means differ by only 0.2 V.
-- **Dynamic loading.** With multi-step control limited to 6 A, the chopper settles in **10.4 ms**. Two load steps then reverse the dc neutral current, from −0.13 A to 1.14 A and then to −1.39 A, and the capacitor voltages stay balanced throughout.
+- **Direct application.** A 25.2 V imbalance is removed in a single switching action and settles within 5 ms. The inductor current peaks at 18.1 A, against the 18.3 A predicted by the closed-form expression. The capacitor difference then stays within about ±0.4 V.
+- **Ripple-compensated application.** The drift is removed just as well, with an order of magnitude fewer switching actions (140 per second instead of 1865). The capacitor means differ by only 0.2 V.
+- **Dynamic loading.** With multi-step control limited to 6 A, the chopper settles in 10.4 ms. Two load steps then reverse the dc neutral current, from −0.13 A to 1.14 A and then to −1.39 A, and the capacitor voltages stay balanced throughout.
 
 ## What's next in my thesis
 
-- A detailed analysis, a comparative study and **experimental validation** of the control for the full paper.
-- A **curve-fitting observer** that reconstructs three-phase VFD currents from a single DC-link current sensor, fitting a sinusoidal oscillator to sparse, switching-state-dependent samples without needing load parameters.
+- A detailed analysis, a comparative study and experimental validation of the control, for the full paper.
+- A curve-fitting observer that reconstructs the three-phase currents of a variable-frequency drive from a single DC-link current sensor. It fits a sinusoidal oscillator to sparse samples that depend on the switching state, and it needs no load parameters.
 
 ## Publication
 

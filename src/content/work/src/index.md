@@ -8,11 +8,8 @@ period: "Jan – May '26"
 tags: [PLECS, Resonant converters, FHA, Magnetics]
 ---
 
-## Overview
+For the Switched Mode Power Conversion course I designed a 1 kW half-bridge series resonant converter, the kind used in telecom power supplies. It takes 400 V down to 48 V at 100 kHz, and I simulated it in PLECS.
 
-A 400 V → 48 V, 100 kHz half-bridge series resonant converter for telecom supplies, designed and simulated in PLECS.
+I sized the resonant tank from an FHA-based impedance model. Then I chose the switches and the magnetic cores by working through the conduction, switching and core losses.
 
-## What I did
-
-- Sized the **resonant tank** using FHA-based impedance modelling.
-- Selected switches and cores from **conduction, switching and core-loss** analysis.
+I am now a teaching assistant for the same course.

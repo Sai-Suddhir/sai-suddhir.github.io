@@ -13,6 +13,17 @@ export const site = {
   wip: 'Work in progress. More projects and photos are on the way.',
 };
 
+// Options for the one line under your name on the home page.
+// To switch, change the number in `role: roleOptions[0]` below. Option 5 hides the line.
+export const roleOptions = [
+  /* 0 */ 'I build power electronics, from the control law to the circuit board.',
+  /* 1 */ 'Electrical and electronics engineer at IIT Madras. I like taking an idea from the maths to working hardware.',
+  /* 2 */ 'Aerospace by degree, electrical by choice.',
+  /* 3 */ 'Dual-degree student at IIT Madras, working on power electronics, control and embedded systems.',
+  /* 4 */ 'Power electronics, control systems and embedded hardware at IIT Madras',
+  /* 5 */ '',
+];
+
 export const profile = {
   name: 'Sai Suddhir A B',
   institution: 'IIT Madras',
@@ -24,8 +35,7 @@ export const profile = {
     cv: '/cv.pdf',
   },
   photoNote: '',
-  // One line under your name on the home page. Set to '' to hide it.
-  role: 'Power electronics, control systems and embedded hardware at IIT Madras',
+  role: roleOptions[0],
   // Used for search engines and link previews (not shown on the page).
   tagline:
     'Dual-degree student at IIT Madras working across power electronics, control systems and embedded hardware, from switching-surface theory to FPGA and PCB design.',
@@ -36,10 +46,15 @@ export const profile = {
 // To switch, change the number in `quote: quoteOptions[0]` below.
 export const quoteOptions = [
   /* 0 */ { text: 'What I cannot create, I do not understand.', by: 'Richard Feynman' },
-  /* 1 */ { text: 'Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.', by: 'Dr. A.P.J. Abdul Kalam' },
-  /* 2 */ { text: 'Scientists discover the world that exists. Engineers create the world that never was.', by: 'Theodore von Kármán' },
-  /* 3 */ { text: 'No man really becomes a fool until he stops asking questions.', by: 'Charles Proteus Steinmetz' },
-  /* 4 */ { text: 'Derive it on paper. Prove it on the bench.', by: '' },
+  /* 1 */ { text: 'He who can listen to the music in the midst of noise can achieve great things.', by: 'Vikram Sarabhai' },
+  /* 2 */ { text: 'Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.', by: 'Dr. A.P.J. Abdul Kalam' },
+  /* 3 */ { text: 'Once you get the physics right, the rest is mathematics.', by: 'Rudolf Kálmán' },
+  /* 4 */ { text: 'But still try, for who knows what is possible.', by: 'Michael Faraday' },
+  /* 5 */ { text: 'There are so many great souls. My salutations to all of them.', by: 'Tyagaraja, Endaro Mahanubhavulu' },
+  /* 6 */ { text: 'Even when fate says no, effort pays the wage of the work put in.', by: 'Thirukkural 619' },
+  /* 7 */ { text: 'Scientists discover the world that exists. Engineers create the world that never was.', by: 'Theodore von Kármán' },
+  /* 8 */ { text: 'No man really becomes a fool until he stops asking questions.', by: 'Charles Proteus Steinmetz' },
+  /* 9 */ { text: 'Derive it on paper. Prove it on the bench.', by: '' },
 ];
 
 // **double asterisks** make text bold.

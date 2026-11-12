@@ -8,11 +8,8 @@ period: "Jul – Nov '25"
 tags: [TI F28379D, Embedded C, PFC, lag compensator, controller]
 ---
 
-## Overview
+For the Digital Controller for Power Applications course I wrote real-time control firmware on a TI F28379D.
 
-Real-time control firmware for power converters on a **TI F28379D**, written for the Digital Controller for Power Applications course.
+The first part was sinusoidal PWM. I configured the ePWM time-base, compare, action-qualifier and dead-band modules to get phase shift, harmonic injection and active power-factor correction, with the ADC sampling synchronised to the PWM.
 
-## What I did
-
-- Developed **SPWM firmware**, configuring the ePWM time-base, compare, action-qualifier and dead-band modules for phase shift, harmonic injection and **active PFC**, with synchronous ADC sampling.
-- Designed a **boost controller** with hysteresis control, lag compensation, overcurrent protection and precharge.
+The second part was a boost converter controller with hysteresis control, lag compensation, overcurrent protection and precharge.

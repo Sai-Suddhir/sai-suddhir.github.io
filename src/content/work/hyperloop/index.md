@@ -12,8 +12,8 @@ coverAlt: 3D render of the propulsion control board designed for Avishkar Hyperl
 tags: [TI F28379D, MSP432, TI-RTOS, CAN, Altium, Stateflow]
 highlights: 
   - { value: "1st in Asia", label: "European Hyperloop Week 2024, Zurich" }
-  - { value: "Pod-wide", label: "one communication network tying every subsystem together" }
-  - { value: "Fail-safe", label: "fault handling designed in from the start" }
+  - { value: "1 of 7", label: "picked from about 100 applicants for the electrical team" }
+  - { value: "130+", label: "fault cases the pod knows how to handle" }
 gallery:
   - { src: ./pcu-block.png, caption: "Propulsion control unit, with two processors, sensing, gate drive and protected power on one board" }
   - { src: ./tcu-block.png, caption: "Thermal control unit, with commands in over CAN and pump control out" }
@@ -29,36 +29,36 @@ wanted:
   - "Assembled propulsion control board"
 ---
 
-## Overview
+## The team
 
-Avishkar Hyperloop is a 50+ student team at IIT Madras building a scalable hyperloop pod. I was **selected as one of 7 from ~100 electrical applicants**, started out designing and testing PCBs, and went on to **lead the electrical team**.
+Avishkar Hyperloop is a team of more than 50 students at IIT Madras building a scalable hyperloop pod. I applied for the electrical team in my second year and was one of 7 picked from about 100 applicants. I started out designing and testing PCBs and went on to lead the electrical team.
 
-The pod is driven by a linear induction motor (LIM), so its electronics have to sense, control and coordinate propulsion, levitation, cooling and safety in real time, and they have to fail safely when something goes wrong.
+The pod runs on a linear induction motor. Its electronics have to sense, control and coordinate propulsion, levitation, cooling and safety in real time, and they have to fail safely when something breaks. Most of what I built came back to that last requirement.
 
-## What I did
+## The propulsion board
 
-### Propulsion
+I designed the propulsion control unit, a 6-layer board with two microcontrollers. A TI F28379D generates the gate signals for the inverter, and an MSP432 talks to the rest of the pod over CAN. Between them they run v/f control, SVPWM, regenerative braking, sensor fusion and precharge for the motor.
 
-- Designed the **propulsion control unit**, a 6-layer dual-MCU board. TI's F28379D generates the inverter gate signals and the MSP432 talks to the rest of the pod over CAN. Between them they run v/f control, SVPWM, regenerative braking, sensor fusion and precharge for the LIM.
-- Built protection in from the start, with TVS-protected analog inputs, pull-downs that hold the gate signals low by default, and a fused, surge-protected and filtered supply.
+Protection went in from the first schematic. The analog inputs sit behind TVS diodes, pull-downs hold the gate signals low by default, and the supply is fused, surge-protected and filtered.
 
-### Cooling
+## Keeping the battery cool
 
-- Wrote the **thermal control unit firmware** on the MSP432 under TI-RTOS. It reads cell temperatures and coolant pressure over CAN and drives the coolant pumps with a PID loop, holding the HV battery within **±0.5 °C** across cooling nodes. The code is on GitHub, linked below.
+I wrote the firmware for the thermal control unit on the MSP432, under TI-RTOS. It reads cell temperatures and coolant pressure over CAN and drives the coolant pumps with a PID loop. It held the high-voltage battery within ±0.5 °C across the cooling nodes. The code is on GitHub, linked at the bottom of this page.
 
-### Communication and safety
+## One network for the whole pod
 
-- Architected the pod-wide **CAN network** of 300+ messages in CANdb++, with one shared CAN driver that keeps a live picture of every ECU.
-- Implemented the pod's **fault-handling state machine** in MATLAB Stateflow, with 20 states covering 130+ fault cases.
+Every subsystem on the pod talks over a single CAN network. I laid out its 300+ messages in CANdb++ and wrote one shared CAN driver that all the ECUs use, so each of them keeps a live picture of the others.
 
-### Boards
+The fault-handling state machine sits on top of that network. I built it in MATLAB Stateflow with 20 states, and it covers more than 130 fault cases.
 
-- Designed multilayer PCBs for the **propulsion, telecom, cooling, levitation, lighting, safety and braking** systems.
+## The other boards
 
-### Team
+Beyond propulsion, I designed multilayer PCBs for the telecom, cooling, levitation, lighting, safety and braking systems.
 
-- Helped set the **electrical recruitment application** for the 2024–25 team, covering H-bridges, precharge, board power design, CAN and RTOS.
+## Recruiting the next team
 
-## Result
+I helped set the electrical recruitment application for the 2024–25 team. It covered H-bridges, precharge, board power design, CAN and RTOS.
 
-The team placed **1st in Asia and 5th overall at European Hyperloop Week 2024** in Zurich. I later gave an invited talk on hyperloop technology to 200+ students at College of Engineering Trivandrum.
+## How it went
+
+We placed 1st in Asia and 5th overall at European Hyperloop Week 2024 in Zurich. Later I was invited to speak about hyperloop technology to more than 200 students at College of Engineering Trivandrum.

@@ -24,15 +24,15 @@ A model can estimate that hotspot, but a detailed thermal model of a single cell
 
 ## Idea
 
-Build a **reduced-order model**, a handful of states that reproduces the hotspot, average and sensor temperatures of the full model, including for current and coolant profiles it has never seen. A model that small can run inside a BMS, help design the cooling controller, and make drive-cycle and fast-charge studies cheap.
+Build a reduced-order model instead. It keeps only a handful of states, yet reproduces the hotspot, average and sensor temperatures of the full model, even for current and coolant profiles it has never seen. A model that small can run inside a BMS, help design the cooling controller, and make drive-cycle and fast-charge studies cheap.
 
-## What I did
+## What I have done so far
 
 - **Modelled the cell.** A 20 Ah LFP pouch cell standing on a liquid-cooled plate, modelled as a 2D heat equation with heat generated near the tabs and cooling through the faces and the plate, discretised into 1,271 states and verified against an analytical solution.
 - **Generated the data.** Three training runs (steady discharge, power pulses, a C-rate staircase with changing coolant) and two harder runs held back for testing (a multisine current, and fast charging from a warm start).
 - **Showed the system can be reduced.** Four modes capture 99.99% of the energy in the data, and the balanced-truncation error bound drops below 1% at just four states.
 - **Set up the comparison.** Balanced truncation uses the model's equations and comes with an error guarantee. Operator inference learns only from simulation data, which is closer to reality when a new cell chemistry changes the physics. The question is whether the data-only model, trained on three runs, can predict the hotspot as well.
 
-## What it shows so far
+## What it shows
 
 The hotspot always sits just below the tabs, farthest from the cold plate. A mid-cell sensor tracks the average temperature well but underestimates the hotspot, which is exactly the gap a model has to fill. Building and comparing the two reduced models is the next phase of the project.

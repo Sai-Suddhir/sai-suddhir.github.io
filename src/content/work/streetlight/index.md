@@ -20,15 +20,14 @@ wanted:
   - "A unit installed in the field"
 ---
 
-## Problem
+## How street lights usually work
 
-Street lights are usually switched by hand. Someone turns on the main breaker for a group of streets at 6 pm and off at 6 am. A central control room is expensive because every local connection has to be wired back to it.
+Most street lights are switched by hand. Someone turns on the main breaker for a group of streets at 6 pm and turns it off again at 6 am. Running them all from a central control room is expensive, because every local connection has to be wired back to it.
 
-## What I did
+## The timer
 
-- Designed a timer PCB and firmware in which an **ATtiny85** reads a **real-time clock over I²C** and switches a relay that controls a group of lights.
-- Kept it **low-cost and simple** for mass deployment.
+I designed a small timer board and its firmware for ROLFS, a company in Chennai. An ATtiny85 reads a real-time clock over I²C and switches a relay that controls a group of lights. I kept it cheap and simple, because it had to be made and installed in large numbers.
 
-## Result
+## Where it is now
 
-The timer now runs **2000+ street lights across Coimbatore**.
+The timer runs more than 2000 street lights across Coimbatore.
