@@ -42,7 +42,8 @@ const md = (s: string) =>
             </span>
           ))}
         </h1>
-        <figure class="quote fade" style="--h:0">
+        {profile.role && <p class="role fade" style="--h:0">{profile.role}</p>}
+        <figure class="quote fade" style="--h:1">
           <blockquote>{intro.quote.text}</blockquote>
           {intro.quote.by && <figcaption>{intro.quote.by}</figcaption>}
         </figure>
@@ -76,58 +77,68 @@ const md = (s: string) =>
     </div>
   </section>
 
-  <!-- ───────── Background: education, interests, honors ───────── -->
+  <!-- ───────── Background: education, interests, honors, life outside the lab ───────── -->
   <section class="section" id="background">
     <div class="container">
       <div class="section-head" data-reveal>
         <span class="eyebrow">Background</span>
-        <h2 class="section-title" data-split>A little more about me</h2>
+        <h2 class="section-title" data-split>{about.heading}</h2>
       </div>
+      <h3 class="mini-head" data-reveal>Education</h3>
+      <ul class="edu" data-stagger="90">
+        {about.education.map((e) => (
+          <li class="rule-in" data-reveal>
+            <div>
+              <p class="edu-school">{e.school}</p>
+              <p class="edu-degree">{e.degree}</p>
+            </div>
+            <div class="edu-meta">
+              <span>{e.period}</span>
+              {e.detail && <span class="edu-detail">{e.detail}</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <h3 class="mini-head" data-reveal>Honors</h3>
+      <ul class="honors" data-stagger="70">
+        {about.honors.map((h) => (
+          <li class="rule-in" data-reveal>
+            <span class="honor-lead">{h.lead}</span>
+            <span class="honor-text">{h.text}</span>
+          </li>
+        ))}
+      </ul>
+
       <div class="bg-grid">
-        <div>
-          <h3 class="mini-head" data-reveal>Education</h3>
-          <ul class="edu" data-stagger="90">
-            {about.education.map((e) => (
-              <li class="rule-in" data-reveal>
-                <div>
-                  <p class="edu-school">{e.school}</p>
-                  <p class="edu-degree">{e.degree}</p>
-                </div>
-                <div class="edu-meta">
-                  <span>{e.period}</span>
-                  {e.detail && <span class="edu-detail">{e.detail}</span>}
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <h3 class="mini-head" data-reveal>Honors &amp; leadership</h3>
-          <ul class="bullets honors" data-stagger="60">
-            {about.honors.map((h) => <li data-reveal>{h}</li>)}
-            {about.leadership.map((l) => (
-              <li data-reveal>
-                <strong>{l.role}</strong>: {l.text} {isTodo(l.period) ? <Todo text={l.period} /> : <span class="period">({l.period})</span>}
-              </li>
-            ))}
-          </ul>
-        </div>
-
         <div>
           <h3 class="mini-head" data-reveal>Interests</h3>
           <div class="interests">
             <div data-reveal>
               <p class="int-label">In engineering</p>
-              <ul class="chips" data-stagger="50">
+              <ul class="chips" data-stagger="40">
                 {about.interests.engineering.map((x) => <li data-reveal>{x}</li>)}
               </ul>
             </div>
             <div data-reveal>
               <p class="int-label">Outside it</p>
-              <ul class="chips chips-soft" data-stagger="50">
+              <ul class="chips chips-soft" data-stagger="40">
                 {about.interests.life.map((x) => <li data-reveal>{x}</li>)}
               </ul>
             </div>
           </div>
+        </div>
+
+        <div>
+          <h3 class="mini-head" data-reveal>Beyond the lab</h3>
+          <ul class="beyond" data-stagger="70">
+            {about.beyond.map((x) => (
+              <li data-reveal>
+                <span class="beyond-lead">{x.lead}</span>
+                <span class="beyond-text">{x.text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
@@ -139,7 +150,7 @@ const md = (s: string) =>
       <div class="section-head" data-reveal>
         <span class="eyebrow">Work</span>
         <h2 class="section-title" data-split>Research &amp; projects</h2>
-        <p class="section-sub">Pick any card to open its full page, with images, documents and code.</p>
+        <p class="section-sub">Each card opens the full write-up, with figures, documents and code.</p>
       </div>
 
       <h3 class="mini-head" data-reveal>Publication</h3>
@@ -324,7 +335,16 @@ const md = (s: string) =>
   }
   @keyframes focus-in { to { opacity: 1; filter: blur(0); transform: none; } }
 
-  .quote { margin: clamp(22px, 3.4vw, 36px) auto 0; max-width: 760px; text-wrap: balance; }
+  .role {
+    margin: clamp(16px, 2.2vw, 24px) auto 0;
+    max-width: 640px;
+    font-size: clamp(15px, 1.5vw, 17.5px);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+  .quote { margin: clamp(20px, 3vw, 32px) auto 0; max-width: 760px; text-wrap: balance; }
   .quote blockquote {
     margin: 0;
     font-family: var(--serif);
@@ -426,8 +446,8 @@ const md = (s: string) =>
   .period { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 
   /* ── Background ── */
-  .bg-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 72px); align-items: start; }
-  .bg-grid > div > .mini-head:first-child { margin-top: 0; }
+  #background .section-head + .mini-head { margin-top: 0; }
+  .bg-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 72px); align-items: start; }
 
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chips li {
@@ -443,15 +463,30 @@ const md = (s: string) =>
   .int-label { margin: 0 0 8px; font-size: 13.5px; color: var(--muted); }
   .chips-soft li { background: transparent; border-style: dashed; }
 
+  .edu { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); column-gap: clamp(32px, 6vw, 72px); }
   .edu li { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--line); }
-  .edu li:last-child { border-bottom: 1px solid var(--line); }
   .edu p { margin: 0; }
   .edu-school { font-weight: 600; }
   .edu-degree { color: var(--muted); font-size: 14.5px; }
   .edu-meta { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-size: 13px; color: var(--muted); white-space: nowrap; font-family: var(--mono); }
   .edu-detail { color: var(--accent); }
-  .honors li { font-size: 15.5px; }
-  .honors :global(strong) { color: var(--ink); font-weight: 600; }
+  /* honors: the result in serif, the context beside it */
+  .honors { border-bottom: 1px solid var(--line); }
+  .honors li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+    column-gap: clamp(20px, 4vw, 48px);
+    align-items: baseline;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .honor-lead { font-family: var(--serif); font-size: clamp(22px, 2.5vw, 28px); line-height: 1.15; color: var(--ink); }
+  .honor-text { color: var(--ink-2); font-size: 15.5px; line-height: 1.55; }
+
+  .beyond { display: grid; gap: 18px; }
+  .beyond li { display: flex; flex-direction: column; gap: 3px; }
+  .beyond-lead { font-weight: 600; font-size: 15.5px; color: var(--ink); }
+  .beyond-text { color: var(--ink-2); font-size: 15px; line-height: 1.6; }
 
   /* ── Work ── */
   .pub { padding: 22px 26px; position: relative; overflow: hidden; }
@@ -629,7 +664,8 @@ const md = (s: string) =>
   @media (max-width: 860px) {
     .intro-body { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: left; }
     .me { width: min(300px, 72vw); }
-    .bg-grid { grid-template-columns: minmax(0, 1fr); }
+    .bg-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .edu { grid-template-columns: minmax(0, 1fr); }
     .kit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .kit > div + div > .mini-head:first-child { margin-top: 36px; }
   }
@@ -648,6 +684,7 @@ const md = (s: string) =>
     .row-arrow { width: 34px; height: 34px; }
   }
   @media (max-width: 560px) {
+    .honors li { grid-template-columns: minmax(0, 1fr); row-gap: 4px; padding: 14px 0; }
     .edu li { flex-direction: column; gap: 6px; }
     .edu-meta { align-items: flex-start; text-align: left; flex-direction: row; gap: 12px; }
     .kit-list div { grid-template-columns: minmax(0, 1fr); gap: 4px; }

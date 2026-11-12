@@ -10,7 +10,7 @@ export const isTodo = (v?: string) => !v || v.startsWith('TODO');
 
 export const site = {
   // A small note at the bottom of every page. Set to '' to remove it.
-  wip: "Still being built: this isn't the final version of the site.",
+  wip: 'Work in progress. More projects and photos are on the way.',
 };
 
 export const profile = {
@@ -24,41 +24,61 @@ export const profile = {
     cv: '/cv.pdf',
   },
   photoNote: '',
+  // One line under your name on the home page. Set to '' to hide it.
+  role: 'Power electronics, control systems and embedded hardware at IIT Madras',
+  // Used for search engines and link previews (not shown on the page).
   tagline:
-    'I work on power converter control: geometric boundary control laws, and the embedded and FPGA hardware that runs and tests them in real time.',
+    'Dual-degree student at IIT Madras working across power electronics, control systems and embedded hardware, from switching-surface theory to FPGA and PCB design.',
 };
 
-/* ── About ───────────────────────────────────────────────── */
-// **double asterisks** make text bold.
 /* ── Home: name → quote → photo + who I am ───────────────── */
+// Quote options for the line under your name. Leave `by` empty for no attribution.
+// To switch, change the number in `quote: quoteOptions[0]` below.
+export const quoteOptions = [
+  /* 0 */ { text: 'What I cannot create, I do not understand.', by: 'Richard Feynman' },
+  /* 1 */ { text: 'Dream, dream, dream. Dreams transform into thoughts and thoughts result in action.', by: 'Dr. A.P.J. Abdul Kalam' },
+  /* 2 */ { text: 'Scientists discover the world that exists. Engineers create the world that never was.', by: 'Theodore von Kármán' },
+  /* 3 */ { text: 'No man really becomes a fool until he stops asking questions.', by: 'Charles Proteus Steinmetz' },
+  /* 4 */ { text: 'Derive it on paper. Prove it on the bench.', by: '' },
+];
+
 // **double asterisks** make text bold.
 export const intro = {
-  // The quote under your name (the one from your old blog). Leave `by` empty for no attribution.
-  quote: { text: 'The magic you are looking for is in the work you are avoiding.', by: '' },
+  quote: quoteOptions[0],
+  // Your own introduction goes here, one string per paragraph.
   paragraphs: [
     "I'm Sai, a dual-degree student at **IIT Madras**. I picked aerospace because of **Dr. A.P.J. Abdul Kalam**, then found myself pulled toward electrical engineering, and taught myself most of it one board at a time. These days I spend my time on power converters and the control behind them.",
     "Away from the lab, I'm a trained **Carnatic vocalist and keyboardist**, and jamming with friends is my favourite way to unwind. I captained my school cricket team, try to keep fitness part of every day, write the occasional essay, and I'm usually the first one excited about a late-night outing or a trip somewhere new.",
   ],
 };
 
-/* ── Background: education, interests, honors ──────────── */
+/* ── Background: education, interests, honors, life outside the lab ── */
 export const about = {
+  // Section heading. Keep it to one line.
+  heading: 'Aerospace by degree, electrical by choice',
   interests: {
     engineering: [
       'Power electronics',
-      'Nonlinear & geometric control',
-      'Embedded & FPGA hardware',
-      'Real-time simulation',
-      'Battery systems for EVs',
+      'Control systems',
+      'VLSI',
+      'Semiconductors',
+      'Embedded systems',
+      'FPGA & digital design',
+      'Analog & mixed-signal circuits',
+      'Electric vehicles',
+      'Motor drives',
+      'Battery systems',
+      'Robotics',
+      'Machine learning',
     ],
     life: ['Carnatic music', 'Keyboard', 'Cricket', 'Fitness', 'Writing', 'Travel & adventure', 'Movies'],
   },
   education: [
     {
       school: 'Indian Institute of Technology Madras',
-      degree: 'B.Tech Aerospace Engineering + M.Tech Electric Vehicles (Dual Degree)',
+      degree: 'B.Tech in Aerospace Engineering + M.Tech in Electric Vehicles (Dual Degree)',
       period: '2022 – 2027',
-      detail: 'CGPA 8.56/ 10',
+      detail: 'CGPA 8.56 / 10',
     },
     {
       school: 'Mahindra World School, Chennai',
@@ -67,14 +87,19 @@ export const about = {
       detail: '',
     },
   ],
+  // `lead` is the headline, `text` is the line beside it.
   honors: [
-    '1st in Asia, 5th overall at European Hyperloop Week 2024, Zurich, with Avishkar Hyperloop',
-    'Top 0.41% in JEE Advanced and top 0.82% in JEE Main, among 1 million candidates',
-    'Invited talk on hyperloop technology to 200+ students at College of Engineering Trivandrum',
-    'Groww Foundation Scholarship (2025–26) and the Alumni MCM Scholarship, IIT Madras',
+    { lead: '1st in Asia', text: 'European Hyperloop Week 2024 in Zurich, and 5th overall, with Avishkar Hyperloop.' },
+    { lead: 'Top 0.41%', text: 'JEE Advanced, among about a million candidates. Top 0.82% in JEE Main.' },
+    { lead: 'Full-time offer', text: 'From TVS Motor Company after a summer internship, with a commendation from the VP of Production.' },
+    { lead: 'Invited speaker', text: 'A talk on hyperloop technology to 200+ students at College of Engineering Trivandrum.' },
+    { lead: 'Scholarships', text: 'Groww Foundation Scholarship (2025–26) and the Alumni MCM Scholarship at IIT Madras.' },
   ],
-  leadership: [
-    { role: 'Executive Committee, CoCAS, IIT Madras', text: 'Policy advocacy, budget oversight and conflict resolution across CFI, E-Cell and Shaastra.', period: 'TODO: dates' },
+  beyond: [
+    { lead: 'Student governance', text: 'Served on the Executive Committee of CoCAS at IIT Madras, handling policy advocacy, budget oversight and conflict resolution across CFI, E-Cell and Shaastra.' },
+    { lead: 'Model United Nations', text: 'Competed at Harvard MUN and won special mentions at MVM MUN and SRM MUN.' },
+    { lead: 'Music', text: 'Trained Carnatic vocalist and keyboardist, with keyboard certification from Trinity College London.' },
+    { lead: 'Sport', text: 'Captained my school cricket team for two years and competed in inter-school athletics.' },
   ],
 };
 
@@ -141,9 +166,10 @@ export const coursework = [
 ];
 
 export const tools = [
-  { group: 'Languages', items: 'C, C++, Python (NumPy, PyTorch, TensorFlow), Verilog, VHDL' },
-  { group: 'Modelling', items: 'MATLAB, Simulink, Simscape, Stateflow, PLECS, LTspice, Typhoon HIL' },
-  { group: 'Hardware', items: 'TI C2000 / MSP432, Altera FPGAs & CPLDs, STM32, Altium, KiCad, Vector CAN, PCAN' },
+  { group: 'Languages', items: 'C, C++, Python (NumPy, PyTorch, TensorFlow), MATLAB, Verilog, VHDL' },
+  { group: 'Modelling', items: 'Simulink, Simscape, Stateflow, PLECS, LTspice, Typhoon HIL, ROS 2, Gazebo' },
+  { group: 'Hardware', items: 'TI C2000 / MSP432, Altera FPGAs & CPLDs, STM32, Vector CAN, PCAN' },
+  { group: 'Design tools', items: 'Altium Designer, KiCad, Code Composer Studio, Quartus, ModelSim' },
 ];
 
 /* ── Contact ─────────────────────────────────────────────── */

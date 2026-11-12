@@ -15,14 +15,14 @@ highlights:
   - { value: "Pod-wide", label: "one communication network tying every subsystem together" }
   - { value: "Fail-safe", label: "fault handling designed in from the start" }
 gallery:
-  - { src: ./pcu-block.png, caption: "Propulsion control unit: two processors, sensing, gate drive and protected power on one board" }
-  - { src: ./tcu-block.png, caption: "Thermal control unit: commands in over CAN, pump control out" }
-  - { src: ./levitation-layout.png, caption: "Levitation module PCB: layout" }
-  - { src: ./levitation-board.png, caption: "Levitation module PCB: 3D view" }
+  - { src: ./pcu-block.png, caption: "Propulsion control unit, with two processors, sensing, gate drive and protected power on one board" }
+  - { src: ./tcu-block.png, caption: "Thermal control unit, with commands in over CAN and pump control out" }
+  - { src: ./levitation-layout.png, caption: "Levitation module PCB, layout" }
+  - { src: ./levitation-board.png, caption: "Levitation module PCB, 3D view" }
 documents:
   - { title: "Levitation module PCB schematic", file: levitation-schematic.pdf, kind: schematic, note: "6 pages" }
 code:
-  - { title: "Avishkar-Work", url: "https://github.com/Sai-Suddhir/Avishkar-Work", description: "Firmware I wrote for the pod's thermal control unit: CAN messaging and coolant control on the MSP432." }
+  - { title: "Avishkar-Work", url: "https://github.com/Sai-Suddhir/Avishkar-Work", description: "Firmware I wrote for the pod's thermal control unit, covering CAN messaging and coolant control on the MSP432." }
 wanted: 
   - "The pod at European Hyperloop Week 2024"
   - "Team photo in Zurich"
@@ -40,7 +40,7 @@ The pod is driven by a linear induction motor (LIM), so its electronics have to 
 ### Propulsion
 
 - Designed the **propulsion control unit**, a 6-layer dual-MCU board. TI's F28379D generates the inverter gate signals and the MSP432 talks to the rest of the pod over CAN. Between them they run v/f control, SVPWM, regenerative braking, sensor fusion and precharge for the LIM.
-- Built protection in from the start: TVS-protected analog inputs, pull-downs that hold the gate signals low by default, and a fused, surge-protected and filtered supply.
+- Built protection in from the start, with TVS-protected analog inputs, pull-downs that hold the gate signals low by default, and a fused, surge-protected and filtered supply.
 
 ### Cooling
 
@@ -48,8 +48,8 @@ The pod is driven by a linear induction motor (LIM), so its electronics have to 
 
 ### Communication and safety
 
-- Architected the pod-wide **CAN network**: 300+ messages in CANdb++, with one shared CAN driver that keeps a live picture of every ECU.
-- Implemented the pod's **fault-handling state machine** in MATLAB Stateflow: 20 states covering 130+ fault cases.
+- Architected the pod-wide **CAN network** of 300+ messages in CANdb++, with one shared CAN driver that keeps a live picture of every ECU.
+- Implemented the pod's **fault-handling state machine** in MATLAB Stateflow, with 20 states covering 130+ fault cases.
 
 ### Boards
 
