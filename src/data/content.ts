@@ -189,4 +189,4 @@ export const tools = [
 
 /* ── Contact ─────────────────────────────────────────────── */
 export const contact =
-  "If you'd like to talk about power electronics, control, embedded hardware, or anything in between, drop me an email.";
+  "If you'd like to talk to me about anything at all, drop me an email.";
