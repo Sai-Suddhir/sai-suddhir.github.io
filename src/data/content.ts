@@ -18,7 +18,7 @@ export const site = {
 export const roleOptions = [
   /* 0 */ 'I build things. Sometimes they work the first time.',
   /* 1 */ 'Electrical and electronics engineer at IIT Madras. I like taking an idea from the maths to working hardware.',
-  /* 2 */ 'Aerospace by degree, electrical by choice.',
+  /* 2 */ 'Engineering student at IIT Madras.',
   /* 3 */ 'Dual-degree student at IIT Madras, working on power electronics, control and embedded systems.',
   /* 4 */ 'Power electronics, control systems and embedded hardware at IIT Madras',
   /* 5 */ '',
@@ -70,7 +70,7 @@ export const intro = {
 /* ── Background: education, interests, honors, life outside the lab ── */
 export const about = {
   // Section heading. Keep it to one line.
-  heading: 'Aerospace by degree, electrical by choice',
+  heading: 'Background',
   interests: {
     engineering: [
       'Power electronics',
