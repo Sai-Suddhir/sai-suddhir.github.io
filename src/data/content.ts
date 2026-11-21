@@ -13,7 +13,7 @@ export const site = {
   wip: 'Work in progress. More projects and photos are on the way.',
   // Visitor stats (goatcounter.com). Put your GoatCounter code here, e.g. 'saisuddhir'
   // for saisuddhir.goatcounter.com. Leave '' to turn tracking off.
-  goatcounter: '',
+  goatcounter: 'saisuddhir',
 };
 
 // Options for the one line under your name on the home page.
