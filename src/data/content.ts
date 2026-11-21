@@ -11,6 +11,9 @@ export const isTodo = (v?: string) => !v || v.startsWith('TODO');
 export const site = {
   // A small note at the bottom of every page. Set to '' to remove it.
   wip: 'Work in progress. More projects and photos are on the way.',
+  // Visitor stats (goatcounter.com). Put your GoatCounter code here, e.g. 'saisuddhir'
+  // for saisuddhir.goatcounter.com. Leave '' to turn tracking off.
+  goatcounter: '',
 };
 
 // Options for the one line under your name on the home page.

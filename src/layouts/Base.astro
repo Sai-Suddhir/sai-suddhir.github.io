@@ -46,6 +46,9 @@ const here = (hash: string) => (isHome ? hash : '/' + hash);
       } catch (e) {}
       document.documentElement.classList.add('js');
     </script>
+    {import.meta.env.PROD && site.goatcounter && (
+      <script is:inline async data-goatcounter={`https://${site.goatcounter}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>
+    )}
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
